@@ -10,4 +10,4 @@ COPY ./apps/api-caching-server/ /app
 
 EXPOSE 8004
 
-CMD ["python3", "-m", "flask", "run", "--debugger"]
+CMD ["python3", "-m", "flask", "run"]
