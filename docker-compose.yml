@@ -1,18 +1,29 @@
 version: "3"
 
 services:
-  mysql_db:
+  velyb-db:
     image: mysql:latest
     ports:
       - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: velib
+      MYSQL_DATABASE: velyb
       MYSQL_USER: mysql
-      MYSQL_PASSWORD: velib_password
+      MYSQL_PASSWORD: velyb
     volumes:
       - mysql_data:/var/lib/mysql
       - ./script.sql:/docker-entrypoint-initdb.d/script.sql
+
+
+  velyb-web-server:
+    build:
+      context: .
+      dockerfile: apps/velyb-web-server/Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      FLASK_APP: app.py
+      FLASK_RUN_HOST: 0.0.0.0
 
 volumes:
   mysql_data:
