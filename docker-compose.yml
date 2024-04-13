@@ -24,6 +24,9 @@ services:
       FLASK_APP: app.py
       FLASK_RUN_HOST: 0.0.0.0
       FLASK_RUN_PORT: 8000
+    depends_on:
+      - velyb-db
+      - api-caching-server 
 
   microservices_authentification:
     build:
@@ -35,6 +38,10 @@ services:
       FLASK_APP: app.py
       FLASK_RUN_HOST: 0.0.0.0
       FLASK_RUN_PORT: 8001
+    depends_on:
+      - velyb-db
+      - velyb-web-server
+
 
   microservices_favorite:
     build:
@@ -46,6 +53,10 @@ services:
       FLASK_APP: app.py
       FLASK_RUN_HOST: 0.0.0.0
       FLASK_RUN_PORT: 8002
+    depends_on:
+      - velyb-db
+      - velyb-web-server
+
 
   microservices_user:
     build:
@@ -57,6 +68,10 @@ services:
       FLASK_APP: app.py
       FLASK_RUN_HOST: 0.0.0.0
       FLASK_RUN_PORT: 8003
+    depends_on:
+      - velyb-db
+      - velyb-web-server
+
 
   api-caching-server:
     build:
@@ -68,5 +83,8 @@ services:
       FLASK_APP: app.py
       FLASK_RUN_HOST: 0.0.0.0
       FLASK_RUN_PORT: 8004
+    depends_on:
+      - velyb-db
+
 volumes:
   mysql_data:
