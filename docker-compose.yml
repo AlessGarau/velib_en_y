@@ -29,7 +29,7 @@ services:
       - ./apps/velyb-web-server:/app
     depends_on:
       - velyb-db
-      - api-caching-server 
+      - api-caching-server
 
   microservices_authentification:
     build:
@@ -42,10 +42,11 @@ services:
       FLASK_RUN_HOST: 0.0.0.0
       FLASK_RUN_PORT: 8001
       FLASK_ENV: development
+    volumes:
+      - ./apps/microservices/authentification:/app
     depends_on:
       - velyb-db
       - velyb-web-server
-
 
   microservices_favorite:
     build:
@@ -58,10 +59,11 @@ services:
       FLASK_RUN_HOST: 0.0.0.0
       FLASK_RUN_PORT: 8002
       FLASK_ENV: development
+    volumes:
+      - ./apps/microservices/favorite:/app
     depends_on:
       - velyb-db
       - velyb-web-server
-
 
   microservices_user:
     build:
@@ -74,10 +76,11 @@ services:
       FLASK_RUN_HOST: 0.0.0.0
       FLASK_RUN_PORT: 8003
       FLASK_ENV: development
+    volumes:
+      - ./apps/microservices/user:/app
     depends_on:
       - velyb-db
       - velyb-web-server
-
 
   api-caching-server:
     build:
@@ -90,6 +93,8 @@ services:
       FLASK_RUN_HOST: 0.0.0.0
       FLASK_RUN_PORT: 8004
       FLASK_ENV: development
+    volumes:
+      - ./apps/api-caching-server:/app
     depends_on:
       - velyb-db
 
