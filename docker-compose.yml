@@ -1,0 +1,102 @@
+version: "3"
+
+services:
+  velyb-db:
+    image: mysql:latest
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: velyb
+      MYSQL_USER: mysql
+      MYSQL_PASSWORD: velyb
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./script.sql:/docker-entrypoint-initdb.d/script.sql
+
+  velyb-web-server:
+    build:
+      context: .
+      dockerfile: apps/velyb-web-server/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      FLASK_APP: app.py
+      FLASK_RUN_HOST: 0.0.0.0
+      FLASK_RUN_PORT: 8000
+      FLASK_ENV: development
+    volumes:
+      - ./apps/velyb-web-server:/app
+    depends_on:
+      - velyb-db
+      - api-caching-server
+
+  microservices_authentification:
+    build:
+      context: .
+      dockerfile: apps/microservices/authentification/Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      FLASK_APP: app.py
+      FLASK_RUN_HOST: 0.0.0.0
+      FLASK_RUN_PORT: 8001
+      FLASK_ENV: development
+    volumes:
+      - ./apps/microservices/authentification:/app
+    depends_on:
+      - velyb-db
+      - velyb-web-server
+
+  microservices_favorite:
+    build:
+      context: .
+      dockerfile: apps/microservices/favorite/Dockerfile
+    ports:
+      - "8002:8002"
+    environment:
+      FLASK_APP: app.py
+      FLASK_RUN_HOST: 0.0.0.0
+      FLASK_RUN_PORT: 8002
+      FLASK_ENV: development
+    volumes:
+      - ./apps/microservices/favorite:/app
+    depends_on:
+      - velyb-db
+      - velyb-web-server
+
+  microservices_user:
+    build:
+      context: .
+      dockerfile: apps/microservices/user/Dockerfile
+    ports:
+      - "8003:8003"
+    environment:
+      FLASK_APP: app.py
+      FLASK_RUN_HOST: 0.0.0.0
+      FLASK_RUN_PORT: 8003
+      FLASK_ENV: development
+    volumes:
+      - ./apps/microservices/user:/app
+    depends_on:
+      - velyb-db
+      - velyb-web-server
+
+  api-caching-server:
+    build:
+      context: .
+      dockerfile: apps/api-caching-server/Dockerfile
+    ports:
+      - "8004:8004"
+    environment:
+      FLASK_APP: app.py
+      FLASK_RUN_HOST: 0.0.0.0
+      FLASK_RUN_PORT: 8004
+      FLASK_ENV: development
+    volumes:
+      - ./apps/api-caching-server:/app
+    depends_on:
+      - velyb-db
+
+volumes:
+  mysql_data:
