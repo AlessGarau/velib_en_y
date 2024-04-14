@@ -12,6 +12,6 @@ CREATE TABLE `favorite_station`(
     `name` VARCHAR(255) NOT NULL,
     `picture` TEXT NULL,
     `name_custom` VARCHAR(255) NULL,
-    FOREIGN KEY(`user_id`) REFERENCES `User`(`user_id`) ON DELETE CASCADE,
+    FOREIGN KEY(`user_id`) REFERENCES `user`(`user_id`) ON DELETE CASCADE,
     PRIMARY KEY(`station_code`, `user_id`)
 );
