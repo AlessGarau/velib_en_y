@@ -10,4 +10,4 @@ COPY ./apps/velyb-web-server/ /app
 
 EXPOSE 8001
 
-CMD [ "python3", "-m", "flask", "run"]
+CMD ["python3", "-m", "flask", "run", "--reload"]
