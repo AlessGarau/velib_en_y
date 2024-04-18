@@ -17,8 +17,10 @@ def index():
         cursor.execute(query, (user_id,))
 
         favorite_stations = []
-        for row in cursor.fetchall():
-            favorite_stations.append(FavoriteStation(*row).to_dict())
+        rows = cursor.fetchall()
+        for row in rows:
+            favorite_station = FavoriteStation(*row)
+            favorite_stations.append(favorite_station.to_dict())
         cursor.close()
 
         return jsonify({'data': favorite_stations}), 200
