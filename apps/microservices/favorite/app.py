@@ -1,7 +1,9 @@
 from flask import Flask, request, jsonify
 from database_access_layer.database import connect_to_database
+from database_access_layer.models.favorite_station import FavoriteStation
 
 app = Flask(__name__)
+cnx = connect_to_database()
 
 
 @app.route('/api/favorites', methods=['GET'])
@@ -12,16 +14,19 @@ def user_favorites():
     user_id = 1
 
     try:
-        # DB Connection
-        conn = connect_to_database()
+        cursor = cnx.cursor(buffered=True)
 
-        # Execute query to SELECT * FROM favorite_station WHERE user_id = user_id
-        cursor = conn.cursor(buffered=True)
-        cursor.execute("SELECT * FROM favorite_station WHERE user_id = %s", (user_id,))
-        user_favorites = cursor.fetchall()
+        query = "SELECT * FROM favorite_station WHERE user_id=%s"
+        cursor.execute(query, (user_id,))
 
-        # Return json with favorites items
-        return jsonify({'data': user_favorites}), 200
+        favorite_stations = []
+        rows = cursor.fetchall()
+        for row in rows:
+            favorite_station = FavoriteStation(*row)
+            favorite_stations.append(favorite_station.to_dict())
+        cursor.close()
+
+        return jsonify({'data': favorite_stations}), 200
 
     except BaseException as e:
         return jsonify({'message': str(e)}), 400
