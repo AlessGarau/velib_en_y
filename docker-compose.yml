@@ -47,7 +47,7 @@ services:
       DB_PASSWORD: root
       DB_DATABASE: velyb
     volumes:
-      - ./apps/microservices/authentification:/app/authentification
+      - ./apps/microservices/authentification:/app
     depends_on:
       - velyb-db
       - velyb-web-server
@@ -68,7 +68,7 @@ services:
       DB_PASSWORD: root
       DB_DATABASE: velyb
     volumes:
-      - ./apps/microservices/favorite:/app/favorite
+      - ./apps/microservices/favorite:/app
     depends_on:
       - velyb-db
       - velyb-web-server
@@ -89,7 +89,7 @@ services:
       DB_PASSWORD: root
       DB_DATABASE: velyb
     volumes:
-      - ./apps/microservices/user:/app/user
+      - ./apps/microservices/user:/app
     depends_on:
       - velyb-db
       - velyb-web-server
