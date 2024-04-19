@@ -11,9 +11,9 @@ def index():
     # Authorization with Auth Microservice
     # If not authorized, return Error 401
     # Else retrieve user_id
+    user_id=1
 
-    response, code = jsonify(user.get_by_id(user_id))
-    return jsonify(response), code
+    return jsonify(user.get_by_id(user_id)), 200
 
 @app.patch("/api/user/update/<str:type>")
 def update(type):
