@@ -41,12 +41,12 @@ class Request:
         self.exec(request, params)
 
         description = self.cursor.description
-        list = self.cursor.fetchall()
+        results = self.cursor.fetchall()
 
         self.close()
 
         headers = list(map(lambda h: h[0], description))
-        return list(map(lambda l: dict(zip(headers, 1)), list))
+        return list(map(lambda l: dict(zip(headers, l)), results))
 
     # Data manipulation (Create, Update, Delete)
     def manage_data(self, request, params=None):
