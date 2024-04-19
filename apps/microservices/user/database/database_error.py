@@ -3,3 +3,6 @@ class DatabaseConnectionError(Exception):
 
 class DatabaseQueryError(Exception):
     pass
+
+class DatabaseEmptyResultError(Exception):
+    pass

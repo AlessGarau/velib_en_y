@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from database.user import User
-from database.database_error import DatabaseConnectionError, DatabaseQueryError
+from database.database_error import DatabaseConnectionError, DatabaseQueryError, DatabaseEmptyResultError
 import re #regex
 
 app = Flask(__name__)
@@ -15,37 +15,38 @@ def index():
 
     return jsonify(user.get_by_id(user_id)), 200
 
-@app.patch("/api/user/update/<str:type>")
+@app.patch("/api/user/update/<string:type>")
 def update(type):
     # Authorization with Auth Microservice
     # If not authorized, return Error 401
     # Else retrieve user_id
+    user_id=1
 
     match type:
 
         # Update password (/api/user/update?type="password")
         case "password":
-            if ("password" not in request.json["password"]):
+            if ("password" not in request.get_json()):
                 return jsonify(
                     {
                         "status": "failed",
                         "message": "Wrong request body format"
                     }
                 ), 400
-            return jsonify(user.update_password(user_id, request.json["password"])), 200
+            return jsonify(user.update_password(user_id, request.get_json()["password"])), 200
 
         # Update profile
         case "profile":
             # Check request body data format
-            if ("firstname" not in request.json["firstname"] or not isinstance(request.json["firstname"], str) or len(request.json["firstname"]) == 0
-                    or "lastname" not in request.json["lastname"] or not isinstance(request.json["lastname"], str) or len(request.json["lastname"]) == 0
-                    or "mail" not in request.json["mail"] or not isinstance(request.json["mail"], str) or not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', request.json["mail"])):
+            if ("firstname" not in request.get_json() or not isinstance(request.get_json()["firstname"], str) or len(request.get_json()["firstname"]) == 0
+                    or "lastname" not in request.get_json() or not isinstance(request.get_json()["lastname"], str) or len(request.get_json()["lastname"]) == 0
+                    or "email" not in request.get_json() or not isinstance(request.get_json()["email"], str) or not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', request.get_json()["email"])):
                 return jsonify(
                     {
                         "message": "Wrong request body format"
                     }
                 ), 400
-            return jsonify(user.update_profile(user_id, request.json)), 200
+            return jsonify(user.update_profile(user_id, request.get_json())), 200
 
         case _:
             return jsonify(
@@ -60,6 +61,7 @@ def delete():
     # Authorization with Auth Microservice
     # If not authorized, return Error 401
     # Else retrieve user_id
+    user_id=1
 
     return jsonify(user.delete(user_id)), 200
 
@@ -80,3 +82,12 @@ def handle_database_query_error(e):
             "message": f"Database query failed : {e}"
         }
     ), 500
+
+@app.errorhandler(DatabaseEmptyResultError)
+def handle_database_empty_result_error(e):
+    return jsonify(
+        {
+            "status": "failed",
+            "message": f"Query problem : {e}"
+        }
+    ), 404
