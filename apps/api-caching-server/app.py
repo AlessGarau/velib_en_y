@@ -2,10 +2,14 @@ from flask import Flask, jsonify
 import socket
 import requests
 import time
+
 app = Flask(__name__)
 
 api_url = "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/velib-disponibilite-en-temps-reel/records?limit=100"
 last_api_call = 0
+
+data_cached = requests.get(api_url).json()
+velib_count = data_cached.get("total_count")
 
 
 def check_api_call():
@@ -19,18 +23,15 @@ def check_api_call():
 
 
 def call_api():
-    api_data = requests.get(api_url).json()
-    velib_count = api_data.get("total_count")
+    global data_cached
     if check_api_call():
+        data = requests.get(api_url).json()
         for offset in range(0, velib_count, 100):
             response = requests.get(api_url + f"&offset={offset}")
             new_data = response.json()
-            api_data["results"].append(new_data)
-        return api_data
-    return api_data
-
-
-first_api_call = call_api()
+            data["results"].append(new_data)
+        data_cached = data
+    return data_cached
 
 
 @ app.route('/')
