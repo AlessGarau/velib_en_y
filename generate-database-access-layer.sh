@@ -7,9 +7,9 @@ copy_db_access_into() {
     echo "DAL Folder copied into $1 folder"
 }
 
-# Check if arguments is provided and is 'user' | 'favorite' | 'authentication'
+# Check if arguments is provided and is 'user' | 'favorite' | 'authentification'
 if [ $# -eq 0 ]; then
-    echo "Script usage: $0 <destination: 'user' | 'favorite' | 'authentication'>"
+    echo "Script usage: $0 <destination: 'user' | 'favorite' | 'authentification'>"
     return 1
 fi
 
@@ -17,14 +17,14 @@ case "$1" in
     "favorite")
         copy_db_access_into "/favorite"
         ;;
-    "authentication")
-        copy_db_access_into "/authentication"
+    "authentification")
+        copy_db_access_into "/authentification"
         ;;
     "user")
         copy_db_access_into "/user"
         ;;
     *)
-        echo "Destination '$1' invalid.\nChoose either 'user' | 'favorite' | 'authentication'"
+        echo "Destination '$1' invalid.\nChoose either 'user' | 'favorite' | 'authentification'"
         return 1
         ;;
 esac
