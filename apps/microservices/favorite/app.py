@@ -109,6 +109,9 @@ def update_favorite(station_code):
     try:
         cursor = cnx.cursor(buffered=True)
 
+        if not all((user_id, name_custom,)):
+            raise BaseException("Credentials are not valid.")
+
         if not favorite_station_exists(user_id, station_code, cursor):
             raise BaseException(f"Favorite station {station_code} doesn't exists")
 
