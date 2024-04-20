@@ -13,8 +13,12 @@ def favorite_station_exists(user_id: str, station_code: str, cursor: MySQLCursor
     Checks that the favorite station targeted (user_id and station_code) exists in the db
     """
 
-    query = "SELECT * FROM favorite_station WHERE user_id=%s AND station_code=%s"
-    cursor.execute(query, (user_id, station_code,))
+    select_query = """
+        SELECT * 
+        FROM favorite_station 
+        WHERE user_id=%s AND station_code=%s
+    """
+    cursor.execute(select_query, (user_id, station_code,))
     row = cursor.fetchall()
 
     return len(row) > 0
@@ -28,14 +32,19 @@ def user_favorites():
     try:
         cursor = cnx.cursor(buffered=True)
 
-        query = "SELECT * FROM favorite_station WHERE user_id=%s"
-        cursor.execute(query, (user_id,))
+        select_query = """
+            SELECT * 
+            FROM favorite_station 
+            WHERE user_id=%s
+        """
+        cursor.execute(select_query, (user_id,))
 
         favorite_stations = []
         rows = cursor.fetchall()
         for row in rows:
             favorite_station = FavoriteStation(*row)
             favorite_stations.append(favorite_station.to_dict())
+
         cursor.close()
 
         return jsonify({
@@ -60,11 +69,57 @@ def delete_favorite(station_code: str):
         if not favorite_station_exists(user_id, station_code, cursor):
             raise BaseException("Credentials are not valid. Check the user or the station's validity.")
 
-        query = "DELETE FROM favorite_station WHERE station_code = %s AND user_id = %s"
-        cursor.execute(query, (station_code, user_id,))
+        delete_query = """
+            DELETE FROM favorite_station 
+            WHERE station_code = %s AND user_id = %s
+        """
+        cursor.execute(delete_query, (station_code, user_id,))
+        cnx.commit()
         cursor.close()
 
         return jsonify({
+            'data': None,
+            'success': True
+        }), 204
+    except BaseException as e:
+        return jsonify({
+            'message': str(e),
+            'success': False
+        }), 400
+
+
+@app.route('/api/favorites/<station_code>', methods=['PUT'])
+def update_favorite(station_code):
+    body = request.get_json()
+    user_id = body.get('user_id')
+    name_custom = body.get('name_custom')
+
+    try:
+        cursor = cnx.cursor(buffered=True)
+
+        if not favorite_station_exists(user_id, station_code, cursor):
+            raise BaseException(f"Favorite station {station_code} doesn't exists")
+
+        update_query = """
+            UPDATE favorite_station
+            SET name_custom = %s
+            WHERE user_id = %s AND station_code = %s
+        """
+        cursor.execute(update_query, (name_custom, user_id, station_code,))
+        cnx.commit()
+
+        select_query = """
+            SELECT * 
+            FROM favorite_station 
+            WHERE user_id = %s AND station_code = %s
+        """
+        cursor.execute(select_query, (user_id, station_code,))
+        updated_station = FavoriteStation(*cursor.fetchone())
+
+        cursor.close()
+
+        return jsonify({
+            'data': updated_station.to_dict(),
             'success': True
         }), 200
     except BaseException as e:
@@ -73,50 +128,48 @@ def delete_favorite(station_code: str):
             'success': False
         }), 400
 
-    # First check if station code exists in favorites with SELECT * FROM favorite_station WHERE station_code = station_code AND user_id = user_id
-    # If doesn't exist, return Error 404
-
-    # try except
-    # Execute query to DELETE FROM favorite_station WHERE station_code = station_code
-    # return 200
-
-
-@app.route('/api/favorites/<station_code>', methods=['PUT'])
-def update_favorite(station_code):
-    # Authorization with Auth Microservice
-    # If not authorized, return Error 401
-    # Else retrieve user_id
-
-    # First check if station code exists in favorites with SELECT * FROM favorite_station WHERE station_code = station_code AND user_id = user_id
-    # If doesn't exist, return Error 404
-
-    data = request.get_json()
-    # Validate inputs
-    # picture, name_custom
-
-    # try except
-    # Execute query to UPDATE favorite_station SET ...values
-    # return 200
-    return jsonify({'foo': 'bar'}), 200
-
 
 @app.route('/api/favorites/', methods=['POST'])
 def create_favorite():
-    # Authorization with Auth Microservice
-    # If not authorized, return Error 401
-    # Else retrieve user_id
+    body = request.get_json()
+    station_code = body.get('station_code')
+    user_id = body.get('user_id')
+    name = body.get('name')
+    picture = body.get('picture')
+    name_custom = body.get('name_custom')
 
-    # First check if station code already exists in favorites with SELECT * FROM favorite_station WHERE station_code = station_code AND user_id = user_id
-    # If it does exist, return Error 400
+    try:
+        cursor = cnx.cursor(buffered=True)
 
-    data = request.get_json()
-    # Validate inputs
-    # picture, name_custom, name, station_code
+        if favorite_station_exists(user_id, station_code, cursor):
+            raise BaseException(f"Favorite station {station_code} already exists")
 
-    # try except
-    # Execute query to INSERT INTO favorite_station ...values
-    # return 200
-    return jsonify({'foo': 'bar'}), 200
+        if not all((station_code, user_id, name, picture, name_custom,)):
+            raise BaseException("Credentials are not valid.")
+
+        insert_query = """INSERT INTO favorite_station VALUES(%s, %s, %s, %s, %s)"""
+        cursor.execute(insert_query, (station_code, user_id, name, picture, name_custom,))
+        cnx.commit()
+
+        select_query = """
+            SELECT * 
+            FROM favorite_station 
+            WHERE user_id = %s AND station_code = %s
+        """
+        cursor.execute(select_query, (user_id, station_code,))
+        favorite_station = FavoriteStation(*cursor.fetchone())
+
+        cursor.close()
+
+        return jsonify({
+            'data': favorite_station.to_dict(),
+            'success': True
+        }), 201
+    except BaseException as e:
+        return jsonify({
+            'message': str(e),
+            'success': False
+        }), 400
 
 
 if __name__ == '__main__':
