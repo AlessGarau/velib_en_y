@@ -24,8 +24,10 @@ def check_api_call():
 
 def call_api():
     global data_cached
+    global velib_count
     if check_api_call():
         data = requests.get(api_url).json()
+        velib_count = data.get("total_count")
         for offset in range(0, velib_count, 100):
             response = requests.get(api_url + f"&offset={offset}")
             new_data = response.json()
