@@ -2,7 +2,7 @@ import re
 import hashlib
 import json
 
-from database_access_layer.database import connect_to_database
+from database_access_layer.database import connect_to_database, close_connection
 from database_access_layer.models.user import User
 from flask import Flask, request, jsonify, session, make_response
 from markupsafe import escape
@@ -11,7 +11,6 @@ from mysql.connector.cursor import MySQLCursor
 
 app = Flask(__name__)
 app.secret_key = b"4072bd90fe380021dd09cb1dc213a782b315656cf0e920866118ea0c2a3bf933"
-cnx = connect_to_database()
 
 
 def email_exists(email: str, cursor: MySQLCursor):
@@ -40,6 +39,8 @@ def is_valid_email(email: str):
 
 @app.route("/api/authentification/register/", methods=["POST"])
 def register():
+    cnx = connect_to_database()
+
     data = request.get_json()
     user_firstname = data.get("firstname")
     user_lastname = data.get("lastname")
@@ -73,10 +74,14 @@ def register():
             "success": False,
             "message": str(e)
         }), 400
+    finally:
+        close_connection(cnx)
 
 
 @app.route('/api/authentification/login', methods=["POST"])
 def login():
+    cnx = connect_to_database()
+
     data = request.get_json()
     user_email = data.get("email")
     user_password = str(hashlib.sha256(escape(data.get("password")).encode()).hexdigest()) if data.get("password") else ""
@@ -114,10 +119,14 @@ def login():
             "success": False,
             "message": str(e)
         }), 400
+    finally:
+        close_connection(cnx)
 
 
 @app.route('/api/authentification/logout', methods=["GET"])
 def logout():
+    cnx = connect_to_database()
+
     try:
         user_json = request.cookies.get('user')
         user = json.loads(user_json) if user_json else None
@@ -144,6 +153,8 @@ def logout():
             "success": False,
             "message": str(e)
         }), 404
+    finally:
+        close_connection(cnx)
 
 
 if __name__ == "__main__":

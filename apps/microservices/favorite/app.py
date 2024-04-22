@@ -1,11 +1,10 @@
 from flask import Flask, request, jsonify
 from mysql.connector.cursor import MySQLCursor
 
-from database_access_layer.database import connect_to_database
+from database_access_layer.database import connect_to_database, close_connection
 from database_access_layer.models.favorite_station import FavoriteStation
 
 app = Flask(__name__)
-cnx = connect_to_database()
 
 
 def favorite_station_exists(user_id: str, station_code: str, cursor: MySQLCursor, check_user: bool = False) -> bool:
@@ -38,6 +37,8 @@ def favorite_station_exists(user_id: str, station_code: str, cursor: MySQLCursor
 
 @app.route('/api/favorites', methods=['GET'])
 def user_favorites():
+    cnx = connect_to_database()
+
     body = request.get_json()
     user_id = body.get('user_id')
 
@@ -68,10 +69,14 @@ def user_favorites():
             'message': str(e),
             'success': False
         }), 400
+    finally:
+        close_connection(cnx)
 
 
 @app.route('/api/favorites/<station_code>', methods=['DELETE'])
 def delete_favorite(station_code: str):
+    cnx = connect_to_database()
+
     body = request.get_json()
     user_id = body.get('user_id')
 
@@ -98,10 +103,14 @@ def delete_favorite(station_code: str):
             'message': str(e),
             'success': False
         }), 400
+    finally:
+        close_connection(cnx)
 
 
 @app.route('/api/favorites/<station_code>', methods=['PUT'])
 def update_favorite(station_code):
+    cnx = connect_to_database()
+
     body = request.get_json()
     user_id = body.get('user_id')
     name_custom = body.get('name_custom')
@@ -142,10 +151,14 @@ def update_favorite(station_code):
             'message': str(e),
             'success': False
         }), 400
+    finally:
+        close_connection(cnx)
 
 
 @app.route('/api/favorites/', methods=['POST'])
 def create_favorite():
+    cnx = connect_to_database()
+
     body = request.get_json()
     station_code = body.get('station_code')
     user_id = body.get('user_id')
@@ -185,6 +198,8 @@ def create_favorite():
             'message': str(e),
             'success': False
         }), 400
+    finally:
+        close_connection(cnx)
 
 
 if __name__ == '__main__':
