@@ -30,6 +30,9 @@ services:
     depends_on:
       - velyb-db
       - api-caching-server
+      - microservices_authentification
+      - microservices_user
+      - microservices_favorite
 
   microservices_authentification:
     build:
@@ -50,7 +53,6 @@ services:
       - ./apps/microservices/authentification:/app
     depends_on:
       - velyb-db
-      - velyb-web-server
 
   microservices_favorite:
     build:
@@ -71,7 +73,6 @@ services:
       - ./apps/microservices/favorite:/app
     depends_on:
       - velyb-db
-      - velyb-web-server
 
   microservices_user:
     build:
@@ -92,7 +93,6 @@ services:
       - ./apps/microservices/user:/app
     depends_on:
       - velyb-db
-      - velyb-web-server
 
   api-caching-server:
     build:
@@ -107,8 +107,6 @@ services:
       FLASK_ENV: development
     volumes:
       - ./apps/api-caching-server:/app
-    depends_on:
-      - velyb-db
 
 volumes:
   mysql_data:
