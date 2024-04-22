@@ -1,93 +1,180 @@
 from flask import Flask, request, jsonify
-from database.user import User
-from database.database_error import DatabaseConnectionError, DatabaseQueryError, DatabaseEmptyResultError
-import re #regex
+from mysql.connector.cursor import MySQLCursor
+import hashlib
+
+from database_access_layer.database import connect_to_database
+from database_access_layer.models.user import User
 
 app = Flask(__name__)
-user = User()
+cnx = connect_to_database()
+
+def user_exists(user_id: int, cursor: MySQLCursor) -> bool:
+    """
+    Checks that the user targeted (user_id) exists in the db
+    """
+    select_query = """
+        SELECT * 
+        FROM user 
+        WHERE user_id=%s
+    """
+    cursor.execute(select_query, (user_id,))
+    user = cursor.fetchall()
+
+    return len(user) > 0
+
+def to_hash(password):
+        return hashlib.sha256(password.encode("utf-8")).hexdigest()
 
 @app.get("/api/user")
-def index():
-    # Authorization with Auth Microservice
-    # If not authorized, return Error 401
-    # Else retrieve user_id
-    user_id=1
+def user_profile():
+    body = request.get_json()
+    user_id = body.get('user_id')
 
-    return jsonify(user.get_by_id(user_id)), 200
+    try:
+        cursor = cnx.cursor(buffered=True)
+        select_query = """
+            SELECT *
+            FROM user
+            WHERE user_id=%s
+        """
+
+        cursor.execute(select_query, (user_id,))
+        user = cursor.fetchone()
+        cursor.close()
+
+        return jsonify({
+            'data': user,
+            'success': True
+        }), 200
+    
+    except BaseException as e:
+        return jsonify({
+            'message': str(e),
+            'success': False
+        }), 400
 
 @app.patch("/api/user/update/<string:type>")
-def update(type):
-    # Authorization with Auth Microservice
-    # If not authorized, return Error 401
-    # Else retrieve user_id
-    user_id=1
+def update_user(type):
+    body = request.get_json()
+    user_id = body.get('user_id')
 
+    if not user_exists(user_id, cursor):
+        raise BaseException(f"Favorite station {user_id} doesn't exists")
+    
     match type:
 
-        # Update password (/api/user/update?type="password")
+        # Update password (/api/user/update/password)
         case "password":
-            if ("password" not in request.get_json()):
-                return jsonify(
-                    {
-                        "status": "failed",
-                        "message": "Wrong request body format"
-                    }
-                ), 400
-            return jsonify(user.update_password(user_id, request.get_json()["password"])), 200
 
-        # Update profile
+            password = body.get('password')
+            
+            try:
+                cursor = cnx.cursor(buffered=True)
+
+                if not password :
+                    raise BaseException("Credentials are not valid.")
+                
+                update_query = """
+                    UPDATE user
+                    SET password = %s
+                    WHERE user_id = %s
+                """
+                cursor.execute(update_query, (to_hash(password), user_id,))
+                cnx.commit()
+
+                cursor.close()
+
+                return jsonify({
+                    'data': {
+                        'new_password' : password
+                    },
+                    'success': True
+                }), 200
+            
+            except BaseException as e:
+                return jsonify({
+                    'message': str(e),
+                    'success': False
+                }), 400
+
+        # Update profile (/api/user/update/profile)
         case "profile":
-            # Check request body data format
-            if ("firstname" not in request.get_json() or not isinstance(request.get_json()["firstname"], str) or len(request.get_json()["firstname"]) == 0
-                    or "lastname" not in request.get_json() or not isinstance(request.get_json()["lastname"], str) or len(request.get_json()["lastname"]) == 0
-                    or "email" not in request.get_json() or not isinstance(request.get_json()["email"], str) or not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', request.get_json()["email"])):
-                return jsonify(
-                    {
-                        "message": "Wrong request body format"
-                    }
-                ), 400
-            return jsonify(user.update_profile(user_id, request.get_json())), 200
+            firstname = body.get('firstname')
+            lastname = body.get('lastname')
+            email = body.get('email')
+            
+            try:
+                cursor = cnx.cursor(buffered=True)
+
+                if not all((firstname, lastname, email)) :
+                    raise BaseException("Credentials are not valid.")
+                
+                update_query = """
+                    UPDATE user
+                    SET firstname = %s, lastname = %s, email = %s
+                    WHERE user_id = %s
+                """
+                cursor.execute(update_query, (firstname, lastname, email, user_id,))
+                cnx.commit()
+
+                select_query = """
+                    SELECT firstname, lastname* email
+                    FROM user
+                    WHERE user_id = %s
+                """
+                cursor.execute(select_query, (user_id,))
+                updated_user = User(*cursor.fetchone())
+
+                cursor.close()
+
+                return jsonify({
+                    'data': updated_user.to_dict(),
+                    'success': True
+                }), 200
+            
+            except BaseException as e:
+                return jsonify({
+                    'message': str(e),
+                    'success': False
+                }), 400
 
         case _:
             return jsonify(
                 {
-                    "status": "failed",
+                    "success": "failed",
                     "message": f'The type of update "{type}" is not known'
                 }
             ), 404
 
 @app.delete("/api/user/delete")
 def delete():
-    # Authorization with Auth Microservice
-    # If not authorized, return Error 401
-    # Else retrieve user_id
-    user_id=1
+    body = request.get_json()
+    user_id = body.get('user_id')
 
-    return jsonify(user.delete(user_id)), 200
+    try:
+        cursor = cnx.cursor(buffered=True)
 
-@app.errorhandler(DatabaseConnectionError)
-def handle_database_connection_error(e):
-    return jsonify(
-        {
-            "status": "failed",
-            "message": f"Connection to database failed : {e}"
-        }
-    ), 500
+        if not user_exists(user_id, cursor):
+            raise BaseException("Credentials are not valid. Check the user's validity.")
 
-@app.errorhandler(DatabaseQueryError)
-def handle_database_query_error(e):
-    return jsonify(
-        {
-            "status": "failed",
-            "message": f"Database query failed : {e}"
-        }
-    ), 500
+        delete_query = """
+            DELETE FROM user 
+            WHERE user_id = %s
+        """
+        cursor.execute(delete_query, (user_id,))
+        cnx.commit()
+        cursor.close()
 
-@app.errorhandler(DatabaseEmptyResultError)
-def handle_database_empty_result_error(e):
-    return jsonify(
-        {
-            "status": "failed",
-            "message": f"Query problem : {e}"
-        }
-    ), 404
+        return jsonify({
+            'data': None,
+            'success': True
+        }), 204
+    
+    except BaseException as e:
+        return jsonify({
+            'message': str(e),
+            'success': False
+        }), 400
+
+if __name__ == '__main__':
+    app.run()
