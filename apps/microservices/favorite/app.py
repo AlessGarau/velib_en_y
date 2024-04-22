@@ -22,7 +22,7 @@ def favorite_station_exists(user_id: str, station_code: str, cursor: MySQLCursor
         cursor.execute(select_query, (user_id,))
         user = cursor.fetchone()
 
-        if not (user or len(user) > 0):
+        if not (user and len(user) > 0):
             raise BaseException("User does not exist.")
 
     select_query = """
@@ -112,7 +112,7 @@ def update_favorite(station_code):
         if not all((user_id, name_custom,)):
             raise BaseException("Credentials are not valid.")
 
-        if not favorite_station_exists(user_id, station_code, cursor):
+        if not favorite_station_exists(user_id, station_code, cursor, True):
             raise BaseException(f"Favorite station {station_code} doesn't exists")
 
         update_query = """
