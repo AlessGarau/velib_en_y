@@ -20,7 +20,7 @@ def email_exists(email: str, cursor: MySQLCursor):
 
     return len(row) > 0
 
-@app.route("api/authentification/register/", methods=["POST"])
+@app.route("/api/authentification/register/", methods=["POST"])
 def register():
     data = request.get_json()
     user_firstname = str(escape(data.get("firstname")))
@@ -30,6 +30,9 @@ def register():
     
     try:
         cursor = cnx.cursor(buffered=True)
+
+        if not all((user_firstname, user_lastname, user_email, user_password)):
+            raise BaseException('Credentials are not valid.')
         if email_exists(user_email, cursor):
             raise Exception('Email already exists.')
 
@@ -41,15 +44,17 @@ def register():
 
         return jsonify({
             "data": cursor._last_insert_id,
-            "success": "User succesfully registered"
+            "success": True,
+            "message": "User succesfully registered"
         }), 201
     
     except BaseException as e:
         return jsonify({
+            "success": False,
             "message": str(e)
         }), 400
 
-@app.route('api/authentification/login', methods=["POST"])
+@app.route('/api/authentification/login', methods=["POST"])
 def login():
     data = request.get_json()
     user_email = str(escape(data.get("email")))
@@ -57,6 +62,9 @@ def login():
 
     try:
         cursor = cnx.cursor(buffered=True)
+
+        if not all((user_email, user_password)):
+            raise BaseException("Credentials are not valid.")
 
         if  not email_exists(user_email, cursor):
             raise Exception("This email doesnt exist.")
@@ -70,24 +78,49 @@ def login():
             raise Exception("Email and password do not match.")
         
         session["user"] = json.dumps(user.to_dict())
-        response = make_response(jsonify({"message": "User successefully logged in."}))
+        response = make_response(jsonify({
+            "success": True,
+            "message": "User successefully logged in."
+            }))
         response.set_cookie('user', json.dumps(user.to_dict()))
         return response
 
     except BaseException as e:
         return jsonify({
+            "success": False,
             "message": str(e)
         }), 400
 
-@app.route('api/authentification/logout', methods=["GET"])
+@app.route('/api/authentification/logout', methods=["GET"])
 def logout():
-    response = make_response(jsonify({
-        "message": "User successfully disconnected"
-    }))
+    try:
+        user_json = request.cookies.get('user')
+        user = json.loads(user_json)
+        user_session = session["user"]
 
-    response.delete_cookie("user")
-    session.pop("user", None)
-    return response
+        if not user:
+            raise BaseException("No user cookies")
+        
+        if not user_session:
+            raise BaseException("No user session")
+        
+        cursor = cnx.cursor(buffered=True)
+        if not email_exists(user, cursor):
+            raise BaseException("User does not exists.")
+           
+        response = make_response(jsonify({
+            "message": "User successfully disconnected"
+        }))
+
+        response.delete_cookie("user")
+        session.pop("user", None)
+        return response
+    
+    except BaseException as e:
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        }), 404
 
 if __name__ == "__main__":
     app.run(debug=True)
