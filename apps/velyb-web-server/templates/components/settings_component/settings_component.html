@@ -1,4 +1,10 @@
 <div class="sidebar-content setting-component">
     <h1>{{title}}</h1>
     {% include '/components/settings_component/settings_nav_component.html' %}
+    
+    {% if setting_type == 'confidential' %}
+    {% include '/components/settings_component/confidential_component.html'%}
+    {% elif setting_type == 'profile' %}
+    {% include '/components/settings_component/profile_component.html'%}
+    {% endif %}
 </div>

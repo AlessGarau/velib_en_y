@@ -1,4 +1,9 @@
 <div class="sidebar-content auth-component">
     <h1>Stations</h1>
     {% include '/components/station_component/station_nav_component.html' %}
+    {% if station_type == 'all' %}
+    {% include '/components/station_component/all_component.html'%}
+    {% elif station_type == 'favorites' %}
+    {% include '/components/station_component/favorites_component.html'%}
+    {% endif %}
 </div>

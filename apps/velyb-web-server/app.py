@@ -1,3 +1,4 @@
+import json
 from flask import Flask, redirect, render_template, request
 import requests
 from loaders import user_loaders
@@ -33,6 +34,7 @@ def index():
         metadata["user"] = user
     metadata["title"] = "Accueil"
     metadata["key"] = "home"
+    metadata["station_type"] = "all"
 
     return render_template('/layouts/index.html', **metadata)
 
@@ -84,6 +86,7 @@ def settings():
     metadata = {
         **base_metadata,
     }
+    metadata["user"] = user
     metadata["title"] = "Réglages"
     metadata["key"] = "settings"
     metadata["setting_type"] = setting_type_param
@@ -101,10 +104,28 @@ def favorites():
     metadata = {
         **base_metadata,
     }
+    metadata["user"] = user
     metadata["title"] = "Favoris"
     metadata["key"] = "favorites"
+    metadata["station_type"] = "favorites"
 
     return render_template('/layouts/favorites.html', **metadata)
+
+
+@app.route('/logout')
+def logout():
+    response = requests.get('http://microservices_authentification:8001/api/authentification/logout')
+
+    if response.status_code == 200:
+        return redirect('/', code=302)
+    else:
+        message = response.json().get('message', '')
+        return redirect(f"/error/404?message={message}", code=302)
+
+
+@app.route('/error/<code>')
+def error(code=404):
+    return render_template(f"/layouts/{code}.html")
 
 
 if __name__ == '__main__':
