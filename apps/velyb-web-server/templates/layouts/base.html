@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }} - Velyb</title>
+    {% for css_path in css_paths %}
+    <link rel="stylesheet" type="text/css" href={{ css_path }}>
+    {% endfor %}
+</head>
+<body>
+    <main>
+      <section id="sidebar-section">
+        {% include '/components/sidebar_component/sidebar.html'%}
+        {% block sidebar_content %} {% endblock %}
+      </section>
+      <section id="map-section">
+        {% include '/components/map_component/map.html' %}  
+      </section>
+    </main>
+</body>
+</html>

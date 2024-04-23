@@ -1,0 +1,34 @@
+{% if user %}
+{% set nav_urls = nav_items["authorized"] %}
+{% else %}
+{% set nav_urls = nav_items["unauthorized"] %}
+{% endif %}
+
+
+<div class="user-card">
+    {% if user %}
+    <img class="profile_picture" src={{ user["profile_picture"] }}>
+    <div class="user_infos">
+        <p>{{ user["firstname"] }} {{ user["lastname"] }}</p>
+        <span>Toi</span>
+    </div>
+    {% else %}
+    <div class="profile_picture img-placeholder"></div>
+    <div class="user_infos">
+        <p>Invité(e)</p>
+        <span>Toi</span>
+    </div>
+
+    {% endif %}
+</div>
+<nav>
+    {% for url in nav_urls %}
+    <a href="{{ url.link }}" 
+        {% if url.name == title %}class="active-link"{%endif%}>
+        {{ url.name }}
+    </a>
+    {%if not loop.last%}
+    <div class="divider"></div>
+    {%endif%}
+    {% endfor %}
+</nav>
