@@ -2,11 +2,12 @@ import re
 import hashlib
 import json
 
-from database_access_layer.database import connect_to_database, close_connection
-from database_access_layer.models.user import User
 from flask import Flask, request, jsonify, session, make_response
 from markupsafe import escape
 from mysql.connector.cursor import MySQLCursor
+
+from database_access_layer.database import connect_to_database, close_connection
+from database_access_layer.models.user import User
 
 
 app = Flask(__name__)

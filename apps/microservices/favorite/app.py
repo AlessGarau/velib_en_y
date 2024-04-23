@@ -2,6 +2,7 @@ import json
 
 from flask import Flask, request, jsonify
 from mysql.connector.cursor import MySQLCursor
+
 from database_access_layer.database import connect_to_database, close_connection
 from database_access_layer.models.favorite_station import FavoriteStation
 
