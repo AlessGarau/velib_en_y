@@ -1,9 +1,7 @@
-from flask import Flask, jsonify
 import socket
 import requests
 import time
 
-app = Flask(__name__)
 
 api_url = "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/velib-disponibilite-en-temps-reel/records?limit=100"
 last_api_call = 0
@@ -36,12 +34,24 @@ def call_api():
     return data_cached
 
 
-@ app.route('/')
-def index():
-    return '<h1>Streamez <a href="https://open.spotify.com/track/6TzeXZyF3ULjwFz64eoXUc?si=a944a36fff674166">BU$HI </a></h1>'
+HOST = 'localhost'
+PORT = 8004
 
 
-@ app.route('/get_all_velib', methods=['GET'])
-def get_data():
-    all_velib = call_api()
-    return jsonify(all_velib)
+def tcp_server():
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind((HOST, PORT))
+    server_socket.listen(1)
+    print(f"Server listening on {HOST}:{PORT}")
+
+    while True:
+        client_socket, address = server_socket.accept()
+        print(f"Connection received from {address}")
+
+        data = call_api()
+        client_socket.sendall(str(data).encode())
+
+        client_socket.close()
+
+
+tcp_server()
