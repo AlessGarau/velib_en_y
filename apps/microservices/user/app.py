@@ -84,17 +84,35 @@ def update_user():
 
         match type:
             case "password":
-                password = body.get("password")
+                new_password = body.get("new_password")
+                new_password_repeated = body.get("new_password_repeated")
+                old_password = body.get("old_password")
 
-                if not password:
+                if not all((new_password, new_password_repeated, old_password)):
                     raise BaseException("Credentials are not valid.")
 
+                if new_password != new_password_repeated:
+                    raise BaseException("Credentials are not valid. Verify passwords")
+
+                hashed_old_password = to_hash(old_password)
+                select_user = """
+                    SELECT * 
+                    FROM user
+                    WHERE user_id = %s AND password = %s
+                """
+                cursor.execute(select_user, (user_id, hashed_old_password))
+                rows = cursor.fetchall()
+
+                if len(rows) == 0:
+                    raise BaseException("Credentials are not valid. Verify passwords")
+
+                hashed_new_password = to_hash(new_password)
                 update_query = """
                     UPDATE user
                     SET password = %s
                     WHERE user_id = %s
                 """
-                cursor.execute(update_query, (to_hash(password), user_id,))
+                cursor.execute(update_query, (hashed_new_password, user_id))
                 cnx.commit()
 
                 cursor.close()
