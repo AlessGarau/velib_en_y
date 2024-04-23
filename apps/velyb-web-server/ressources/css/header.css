@@ -1,11 +1,10 @@
-/* Header */
-.header-navigation {
+.header-component {
     width: 100%;
-    padding: 0 16px;
     display: flex;
     flex-flow: column;
     gap: 12px;
-
+    margin-bottom: 16px;
+    
     .user-card {
         padding: 16px 0;
         gap: 8px;

@@ -1,7 +1,3 @@
 {% include '/components/logotype_component/logotype.html'%}
-<div class="header-navigation">
-    {% include '/components/header_component/header.html'%}
-</div>
-<div class="sidebar-content">
-    {% block sidebar_content %} {% endblock %}
-</div>
+{% include '/components/header_component/header.html'%}
+{% block sidebar_content %} {% endblock %}

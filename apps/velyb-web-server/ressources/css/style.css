@@ -48,6 +48,13 @@ main {
     }
 }
 
+.sidebar-content {
+    display: flex;
+    flex-flow: column;
+    width: 100%;
+    gap: 16px;
+}
+
 /* Utility */
 
 .divider {
@@ -61,7 +68,6 @@ main {
 }
 
 h1 {
-    font-weight: var(--fw-large);
+    font-weight: var(--fw-medium);
     font-size: var(--fs-large);
-    
 }
