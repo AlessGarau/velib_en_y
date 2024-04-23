@@ -2,11 +2,12 @@ import re
 import hashlib
 import json
 
-from database_access_layer.database import connect_to_database, close_connection
-from database_access_layer.models.user import User
 from flask import Flask, request, jsonify, session, make_response
 from markupsafe import escape
 from mysql.connector.cursor import MySQLCursor
+
+from database_access_layer.database import connect_to_database, close_connection
+from database_access_layer.models.user import User
 
 
 app = Flask(__name__)
@@ -98,15 +99,16 @@ def login():
         if not email_exists(user_email, cursor):
             raise Exception("This email doesnt exist.")
 
-        query = ("SELECT firstname, lastname , profile_picture, email, password FROM user WHERE email = %s")
+        query = ("SELECT * FROM user WHERE email = %s")
         cursor.execute(query, (user_email,))
-        rows = cursor.fetchone()
-        user = User(*rows)
+        row = cursor.fetchone()
+        user = User(*row)
 
         if user_password != user.password:
             raise Exception("Email and password do not match.")
 
         session["user"] = json.dumps(user.to_dict())
+
         response = make_response(jsonify({
             "success": True,
             "message": "User successefully logged in."

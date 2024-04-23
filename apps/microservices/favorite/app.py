@@ -1,3 +1,5 @@
+import json
+
 from flask import Flask, request, jsonify
 from mysql.connector.cursor import MySQLCursor
 
@@ -35,22 +37,40 @@ def favorite_station_exists(user_id: str, station_code: str, cursor: MySQLCursor
     return len(favorite_stations) > 0
 
 
+def user_exists(user_id: int, cursor: MySQLCursor) -> bool:
+    """
+    Checks that the user targeted (user_id) exists in the db
+    """
+    select_query = """
+        SELECT * 
+        FROM user 
+        WHERE user_id=%s
+    """
+    cursor.execute(select_query, (user_id,))
+    user = cursor.fetchall()
+
+    return len(user) > 0
+
+
 @app.route('/api/favorites', methods=['GET'])
 def user_favorites():
     cnx = connect_to_database()
 
-    body = request.get_json()
-    user_id = body.get('user_id')
+    user_json = request.cookies.get('user')
+    user = json.loads(user_json) if user_json else None
 
     try:
         cursor = cnx.cursor(buffered=True)
 
+        if not (user and user_exists(user["id"], cursor)):
+            raise BaseException("Check the user's validity.")
+
         select_query = """
-            SELECT * 
-            FROM favorite_station 
+            SELECT *
+            FROM favorite_station
             WHERE user_id=%s
         """
-        cursor.execute(select_query, (user_id,))
+        cursor.execute(select_query, (user["id"],))
 
         favorite_stations = []
         rows = cursor.fetchall()
@@ -77,20 +97,23 @@ def user_favorites():
 def delete_favorite(station_code: str):
     cnx = connect_to_database()
 
-    body = request.get_json()
-    user_id = body.get('user_id')
+    user_json = request.cookies.get('user')
+    user = json.loads(user_json) if user_json else None
 
     try:
         cursor = cnx.cursor(buffered=True)
 
-        if not favorite_station_exists(user_id, station_code, cursor):
+        if not (user and user_exists(user["id"], cursor)):
+            raise BaseException("Check the user's validity.")
+
+        if not favorite_station_exists(user["id"], station_code, cursor):
             raise BaseException("Credentials are not valid. Check the user or the station's validity.")
 
         delete_query = """
             DELETE FROM favorite_station 
             WHERE station_code = %s AND user_id = %s
         """
-        cursor.execute(delete_query, (station_code, user_id,))
+        cursor.execute(delete_query, (station_code, user["id"],))
         cnx.commit()
         cursor.close()
 
@@ -111,12 +134,18 @@ def delete_favorite(station_code: str):
 def update_favorite(station_code):
     cnx = connect_to_database()
 
+    user_json = request.cookies.get('user')
+    user = json.loads(user_json) if user_json else None
+
     body = request.get_json()
     user_id = body.get('user_id')
     name_custom = body.get('name_custom')
 
     try:
         cursor = cnx.cursor(buffered=True)
+
+        if not (user and user_exists(user["id"], cursor)):
+            raise BaseException("Check the user's validity.")
 
         if not all((user_id, name_custom,)):
             raise BaseException("Credentials are not valid.")
@@ -159,9 +188,11 @@ def update_favorite(station_code):
 def create_favorite():
     cnx = connect_to_database()
 
+    user_json = request.cookies.get('user')
+    user = json.loads(user_json) if user_json else None
+
     body = request.get_json()
     station_code = body.get('station_code')
-    user_id = body.get('user_id')
     name = body.get('name')
     picture = body.get('picture')
     name_custom = body.get('name_custom')
@@ -169,14 +200,17 @@ def create_favorite():
     try:
         cursor = cnx.cursor(buffered=True)
 
-        if not all((station_code, user_id, name, picture, name_custom,)):
+        if not (user and user_exists(user["id"], cursor)):
+            raise BaseException("Check the user's validity.")
+
+        if not all((station_code, user["id"], name, picture, name_custom,)):
             raise BaseException("Credentials are not valid.")
 
-        if favorite_station_exists(user_id, station_code, cursor, True):
+        if favorite_station_exists(user["id"], station_code, cursor, True):
             raise BaseException(f"Favorite {station_code} already exists")
 
         insert_query = """INSERT INTO favorite_station VALUES(%s, %s, %s, %s, %s)"""
-        cursor.execute(insert_query, (station_code, user_id, name, picture, name_custom,))
+        cursor.execute(insert_query, (station_code, user["id"], name, picture, name_custom,))
         cnx.commit()
 
         select_query = """
@@ -184,7 +218,7 @@ def create_favorite():
             FROM favorite_station 
             WHERE user_id = %s AND station_code = %s
         """
-        cursor.execute(select_query, (user_id, station_code,))
+        cursor.execute(select_query, (user["id"], station_code,))
         favorite_station = FavoriteStation(*cursor.fetchone())
 
         cursor.close()
