@@ -101,6 +101,7 @@ def update_user(type):
         case "profile":
             firstname = body.get('firstname')
             lastname = body.get('lastname')
+            profile_picture = body.get('profile_picture')
             email = body.get('email')
             
             try:
@@ -111,14 +112,14 @@ def update_user(type):
                 
                 update_query = """
                     UPDATE user
-                    SET firstname = %s, lastname = %s, email = %s
+                    SET firstname = %s, lastname = %s,  profile_picture = %s, email = %s
                     WHERE user_id = %s
                 """
-                cursor.execute(update_query, (firstname, lastname, email, user_id,))
+                cursor.execute(update_query, (firstname, lastname, profile_picture, email, user_id,))
                 cnx.commit()
 
                 select_query = """
-                    SELECT firstname, lastname* email
+                    SELECT firstname, lastname, profile_picture, email
                     FROM user
                     WHERE user_id = %s
                 """
