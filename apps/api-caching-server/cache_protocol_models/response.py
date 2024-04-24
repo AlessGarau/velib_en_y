@@ -30,5 +30,4 @@ class Response:
                 response += self.__HTTP_500
 
         self.client.send(response.encode())
-        self.client.close
-        return
+        self.client.close()
