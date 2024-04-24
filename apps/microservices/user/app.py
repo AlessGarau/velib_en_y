@@ -34,7 +34,7 @@ def to_hash(password):
 def user_profile():
     cnx = connect_to_database()
 
-    body = request.json()
+    body = request.get_json()
     user_id = body.get('user_id')
 
     try:
@@ -48,7 +48,7 @@ def user_profile():
             WHERE user_id=%s
         """
 
-        cursor.execute(select_query, (user_id))
+        cursor.execute(select_query, (user_id,))
         user = User(*cursor.fetchone())
         cursor.close()
 
@@ -168,9 +168,6 @@ def update_user():
 @app.route("/api/users/<user_id>", methods=['DELETE'])
 def delete_user(user_id):
     cnx = connect_to_database()
-
-    body = request.get_json()
-    user_id = body.get('user_id')
 
     try:
         cursor = cnx.cursor(buffered=True)

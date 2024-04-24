@@ -56,7 +56,7 @@ def user_exists(user_id: int, cursor: MySQLCursor) -> bool:
 def user_favorites():
     cnx = connect_to_database()
 
-    body = request.json()
+    body = request.get_json()
     user_id = body.get('user_id')
 
     try:
@@ -97,7 +97,7 @@ def user_favorites():
 def delete_favorite(station_code: str):
     cnx = connect_to_database()
 
-    body = request.json()
+    body = request.get_json()
     user_id = body.get('user_id')
 
     try:
@@ -185,10 +185,8 @@ def update_favorite(station_code):
 def create_favorite():
     cnx = connect_to_database()
 
-    body = request.json()
-    user_id = body.get('user_id')
-
     body = request.get_json()
+    user_id = body.get('user_id')
     station_code = body.get('station_code')
     name = body.get('name')
     picture = body.get('picture')
