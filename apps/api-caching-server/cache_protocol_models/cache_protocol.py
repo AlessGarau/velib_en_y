@@ -40,12 +40,10 @@ class CacheProtocol(ABC):
                 elif request.method in self.routes.values():
                     if not self.get_cache_validity():
                         self.set_cache()
-                    print(self.get_cache())
                     response.make_response(data=self.get_cache(), code=200)
                 else:
                     response.make_response(code=500)
 
-                # print(f"New connection: {address}") ajouter methode, reponse etc
                 response.send_response()
         except KeyboardInterrupt:
             print("Server is shutting down...")
