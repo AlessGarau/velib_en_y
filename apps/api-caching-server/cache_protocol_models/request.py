@@ -12,6 +12,4 @@ class Request:
         lines = self.request.split("\r\n")
         start_line = lines[0]
 
-        # TODO HEADER
-
         self.method, self.path, _ = start_line.split(" ")

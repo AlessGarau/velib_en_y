@@ -22,12 +22,13 @@ class Response:
         response = ""
         match self.code:
             case 404 | 200:
-                response += self.__HTTP[self.code] + self.__SEPARATOR
-                response += self.__CONTENT_TYPE + self.__SEPARATOR
+                response += f"{self.__HTTP[self.code]}{self.__SEPARATOR}"
+                response += f"Content-Type: {self.__CONTENT_TYPE}{self.__SEPARATOR}"
                 response += f'Content-Length: {len(self.data)}{self.__SEPARATOR}{self.__SEPARATOR}'
-                response += self.data + self.__SEPARATOR
+                response += f"{self.data}{self.__SEPARATOR}"
             case _:
                 response += self.__HTTP_500
 
         self.client.send(response.encode())
         self.client.close
+        return
