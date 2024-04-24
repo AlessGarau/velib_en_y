@@ -17,12 +17,12 @@ class OpenDataCache(CacheProtocol):
     def set_cache(self) -> None:
         res = requests.get(self.API_URL).json()
         self.VELIB_COUNT = res.get('total_count')
-        offset = 100
+        offset = self.VELIB_COUNT - 100
 
-        while (offset < self.VELIB_COUNT):
-            next_res = requests.get(self.API_URL + f"offset={offset}").json()
+        while (offset >= 0):
+            next_res = requests.get(self.API_URL + f"offset={self.VELIB_COUNT - offset if offset > 100 else offset}").json()
             res["results"].append(next_res)
-            offset += 100
+            offset -= 100
 
         self.CACHE = json.dumps(res)
 
