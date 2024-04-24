@@ -1,3 +1,4 @@
+import json
 import socket
 from abc import ABC, abstractmethod
 import time
@@ -32,13 +33,14 @@ class CacheProtocol(ABC):
                 response = Response(client)
 
                 if not self.check_path(request.path):
-                    response.make_response(data={'message': "This route doesn't exist"}, code=404)
+                    response.make_response(data=json.dumps({'message': "This route doesn't exist"}), code=404)
                 elif not request.method in self.routes[request.path]:
                     response.make_response(code=500)
                 elif request.method in self.routes.values():
                     if not self.get_cache_validity():
                         self.set_cache()
-                    response.make_response(data=self.get_cache(), code=200)
+                    print(self.get_cache())
+                    response.make_response(data="self.get_cache()", code=200)
                 else:
                     response.make_response(code=500)
 
