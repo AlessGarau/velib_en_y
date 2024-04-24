@@ -1,0 +1,12 @@
+<nav class="tab-nav">
+    <a href="/login"
+        {% if auth_type == 'login'%} class="active-link"{%endif%}
+        >
+        Connexion
+    </a>
+    <a href="/register"
+        {% if auth_type == 'register'%} class="active-link"{%endif%}
+        >
+        Inscription
+    </a>
+</nav>

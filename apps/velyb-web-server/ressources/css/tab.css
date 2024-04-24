@@ -1,0 +1,15 @@
+.tab-nav {
+    display: flex;
+    flex-flow: row;
+    width: 100%;
+    
+    > a {
+        width: 100%;
+        height: 48px;
+        text-decoration: none;
+        color: var(--clr-black-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}

@@ -10,4 +10,4 @@ COPY ./apps/microservices/user/ /app
 
 EXPOSE 8003
 
-CMD ["python3", "-m", "flask", "run"]
+CMD ["python3", "-m", "flask", "run", "--reload"]
