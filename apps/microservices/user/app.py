@@ -34,13 +34,13 @@ def to_hash(password):
 def user_profile():
     cnx = connect_to_database()
 
-    user_json = request.cookies.get('user')
-    user = json.loads(user_json) if user_json else None
+    body = request.get_json()
+    user_id = body.get('user_id')
 
     try:
         cursor = cnx.cursor(buffered=True)
 
-        if not (user and user_exists(user["id"], cursor)):
+        if not user_exists(user_id, cursor):
             raise BaseException("Credentials are not valid. Check the user's validity.")
         select_query = """
             SELECT *
@@ -48,7 +48,7 @@ def user_profile():
             WHERE user_id=%s
         """
 
-        cursor.execute(select_query, (user["id"],))
+        cursor.execute(select_query, (user_id,))
         user = User(*cursor.fetchone())
         cursor.close()
 
@@ -71,16 +71,14 @@ def update_user():
     cnx = connect_to_database()
 
     body = request.get_json()
+    user_id = body.get('user_id')
     type = request.args.get("type")
-    user_json = request.cookies.get('user')
-    user = json.loads(user_json) if user_json else None
 
     try:
         cursor = cnx.cursor(buffered=True)
 
-        if not (user and user_exists(user["id"], cursor)):
+        if not user_exists(user_id, cursor):
             raise BaseException("Credentials are not valid. Check the user's validity.")
-        user_id = user["id"]
 
         match type:
             case "password":
@@ -171,20 +169,17 @@ def update_user():
 def delete_user(user_id):
     cnx = connect_to_database()
 
-    user_json = request.cookies.get('user')
-    user = json.loads(user_json) if user_json else None
-
     try:
         cursor = cnx.cursor(buffered=True)
 
-        if not (user and user_exists(user["id"], cursor) and user_id != user["id"]):
+        if not user_exists(user_id, cursor):
             raise BaseException("Credentials are not valid. Check the user's validity.")
 
         delete_query = """
             DELETE FROM user 
             WHERE user_id = %s
         """
-        cursor.execute(delete_query, (user["id"],))
+        cursor.execute(delete_query, (user_id,))
         cnx.commit()
         cursor.close()
 
