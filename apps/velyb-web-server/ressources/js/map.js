@@ -1,5 +1,7 @@
+// TODO - Essayer de garder dernière position en localStorage
+// TODO - Si l'user est connecté, remplir la liste favorite_stations 
+
 // Set initial view to Paris
-// TODO - Garder la dernière position en préférences
 const map = L.map('map').setView([48.8566, 2.3522], 13);
 L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -42,8 +44,6 @@ class VelybMap {
             })
             .catch(error => console.error(error));
     }
-
-    // TODO: If user is connected, fill favorite_stations list
 
 }
 
