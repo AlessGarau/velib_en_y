@@ -71,3 +71,26 @@ h1 {
     font-weight: var(--fw-medium);
     font-size: var(--fs-large);
 }
+
+#notification {
+    position: absolute;
+    padding: 8px 16px;
+    width: 100%;
+    text-align: center;
+    font-size: var(--fs-small);
+    color: var(--clr-white-primary);
+    background-color: #F04438;
+    animation-duration: 3s;
+    animation-name: notificationFade;
+    animation-fill-mode: both;
+}
+
+.hide {
+    opacity: 0;
+}
+
+@keyframes notificationFade {
+    0% {opacity: 1;}
+    75% {opacity: 1;}
+    100% {opacity: 0;} 
+ } 

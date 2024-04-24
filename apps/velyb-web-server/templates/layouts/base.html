@@ -9,6 +9,11 @@
 </head>
 <body>
     <main>
+      {% if message and status %}
+      <p id="notification" {% if status == "error"%}class="error"{%endif%}>
+        {{message}}
+      </p>
+      {% endif %}
       <section id="sidebar-section">
         {% include '/components/sidebar_component/sidebar.html'%}
         {% block sidebar_content %} {% endblock %}
@@ -18,4 +23,5 @@
       </section>
     </main>
 </body>
+<script src="/ressources/js/common.js"></script>
 </html>
