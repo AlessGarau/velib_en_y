@@ -105,15 +105,17 @@ def login():
         user = User(*row)
 
         if user_password != user.password:
-            raise Exception("Email and password do not match.")
+            raise Exception("Email or password do not match.")
 
-        session["user"] = json.dumps(user.to_dict())
+        session["user"] = user.to_dict()
 
         response = make_response(jsonify({
             "success": True,
-            "message": "User successefully logged in."
+            "message": "User successefully logged in.",
+            "data": {
+                "user": user.to_dict()
+            }
         }))
-        response.set_cookie('user', json.dumps(user.to_dict()))
 
         return response
     except BaseException as e:
@@ -130,24 +132,13 @@ def logout():
     cnx = connect_to_database()
 
     try:
-        user_json = request.cookies.get('user')
-        user = json.loads(user_json) if user_json else None
-
-        if not user:
-            raise BaseException("No user cookies")
-
         if 'user' not in session:
             raise BaseException("No user session")
-
-        cursor = cnx.cursor(buffered=True)
-        if not email_exists(user["email"], cursor):
-            raise BaseException("User does not exists.")
 
         response = make_response(jsonify({
             "message": "User successfully disconnected"
         }))
-        session.pop("user", None)
-        response.delete_cookie("user")
+        session.clear()
 
         return response
     except BaseException as e:
