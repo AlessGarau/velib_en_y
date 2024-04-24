@@ -1,4 +1,4 @@
-/* :root {
+:root {
     --map-tiles-filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0) brightness(0.4);
 }
 
@@ -6,7 +6,7 @@
     .map-tiles {
         filter:var(--map-tiles-filter, none);
 	}
-} */
+}
 
 #map-section {
     .map-content { 

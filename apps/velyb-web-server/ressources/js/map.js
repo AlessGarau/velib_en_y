@@ -8,11 +8,14 @@ L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
 
 class VelybMap {
     stations = [];
+    favorite_stations = [];
     neighborhoods = new Set();
     total_count = 0;
-    constructor(data_url, selected_neighborhood) {
+
+    constructor(data_url, selected_neighborhood, user_id = null) {
         this.data_url = data_url;
         this.selected_neighborhood = selected_neighborhood;
+        this.user_id = user_id;
     }
 
     set_stations() {
@@ -35,9 +38,13 @@ class VelybMap {
                         `)
                     }
                 })
+                // debugger;
             })
             .catch(error => console.error(error));
     }
+
+    // TODO: If user is connected, fill favorite_stations list
+
 }
 
 const velybMap = new VelybMap('http://localhost:8004/', 'Paris')
