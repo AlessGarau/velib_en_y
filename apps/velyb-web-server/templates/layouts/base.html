@@ -23,5 +23,7 @@
       </section>
     </main>
 </body>
-<script src="/ressources/js/common.js"></script>
+{% for js_path in js_paths %}
+<script src={{ js_path }}></script>
+{% endfor %}
 </html>
