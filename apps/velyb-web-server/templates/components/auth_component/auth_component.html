@@ -1,0 +1,11 @@
+<div class="sidebar-content auth-component">
+    <h1>Authentification</h1>
+    {% include '/components/auth_component/auth_nav_component.html' %}
+
+    {% if auth_type == 'login' %}
+    {% include '/components/auth_component/login_component.html'%}
+    {% elif auth_type == 'register' %}
+    {% include '/components/auth_component/register_component.html'%}
+    {% endif %}
+</div>
+

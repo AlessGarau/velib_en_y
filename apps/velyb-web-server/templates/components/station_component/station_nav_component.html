@@ -1,0 +1,14 @@
+<nav class="tab-nav">
+    <a href="/"
+        {% if key == 'home'%} class="active-link"{%endif%}
+        >
+        Toutes
+    </a>
+    {% if user %}
+    <a href="/favorites"
+        {% if key == 'favorites'%} class="active-link"{%endif%}
+        >
+        Favoris
+    </a>
+    {% endif %}
+</nav>

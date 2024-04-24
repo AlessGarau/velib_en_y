@@ -1,0 +1,12 @@
+<nav class="tab-nav">
+    <a href="/settings?type=profile"
+        {% if setting_type == 'profile'%} class="active-link"{%endif%}
+        >
+        Mon compte
+    </a>
+    <a href="/settings?type=confidential"
+        {% if setting_type == 'confidential'%} class="active-link"{%endif%}
+        >
+        Confidentialité
+    </a>
+</nav>

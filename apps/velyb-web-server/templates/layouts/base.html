@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }} - Velyb</title>
+    {% for css_path in css_paths %}
+    <link rel="stylesheet" type="text/css" href={{ css_path }}>
+    {% endfor %}
+</head>
+<body>
+    <main>
+      {% if message and status %}
+      <p id="notification" {% if status == "error"%}class="error"{%endif%}>
+        {{message}}
+      </p>
+      {% endif %}
+      <section id="sidebar-section">
+        {% include '/components/sidebar_component/sidebar.html'%}
+        {% block sidebar_content %} {% endblock %}
+      </section>
+      <section id="map-section">
+        {% include '/components/map_component/map.html' %}  
+      </section>
+    </main>
+</body>
+{% for js_path in js_paths %}
+<script src={{ js_path }}></script>
+{% endfor %}
+</html>

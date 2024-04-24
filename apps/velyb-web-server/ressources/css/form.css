@@ -1,0 +1,30 @@
+form {
+    gap: 16px;
+    display: flex;
+    flex-flow: column;
+    padding: 16px 0;
+
+    div {
+        width: 100%;
+        display: flex;
+        flex-flow: column;
+        
+        label {
+            font-size: var(--fs-small);
+        }
+        input {
+            width: 100%;
+            font-size: var(--fs-medium);        
+            border: none;
+            background: none;
+        }
+    }
+
+    button {
+        padding: 12px;
+        width: 100%;
+        border: none;
+        background-color: var(--clr-blue-opacity-30);
+        font-size: var(--fs-medium);
+    }
+}

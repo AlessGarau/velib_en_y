@@ -129,7 +129,7 @@ def update_user():
 
                 update_query = """
                     UPDATE user
-                    SET firstname = %s, lastname = %s,  profile_picture = %s
+                    SET firstname = %s, lastname = %s, profile_picture = %s
                     WHERE user_id = %s
                 """
                 cursor.execute(update_query, (firstname, lastname, profile_picture, user_id,))
