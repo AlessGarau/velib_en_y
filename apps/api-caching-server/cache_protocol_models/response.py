@@ -27,7 +27,7 @@ class Response:
                 response += f'Content-Length: {len(self.data)}{self.__SEPARATOR}{self.__SEPARATOR}'
                 response += f"{self.data}{self.__SEPARATOR}"
             case _:
-                response += self.__HTTP_500
+                response += self.__HTTP[500]
 
         self.client.send(response.encode())
         self.client.close()
