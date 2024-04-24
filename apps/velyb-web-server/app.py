@@ -1,13 +1,16 @@
 import json
-from flask import Flask, redirect, render_template, request
+from flask import Flask, make_response, redirect, render_template, request, session
 import requests
+import requests.cookies
 from loaders import user_loaders
 
 app = Flask(__name__,
             static_folder='ressources/',)
+app.secret_key = b"4072bd90fe380021dd09cb1dc213a782b315656cf0e920866118ea0c2a3bf933"
 
 base_metadata = {
     'css_paths': ['ressources/css/style.css', 'ressources/css/header.css', 'ressources/css/tab.css'],
+    'js_paths': ['/ressources/js/common.js'],
     'nav_items': {
         'unauthorized': [
             {'name': 'Accueil', 'link': '/', 'key': 'home'},
@@ -39,22 +42,51 @@ def index():
     return render_template('/layouts/index.html', **metadata)
 
 
-@app.route('/login')
+@app.route('/login', methods=["GET", "POST"])
 def login():
-    user = user_loaders.get_user_from_cookie()
+    if request.method == "GET":
+        user = user_loaders.get_user_from_cookie()
 
-    if user:
-        return redirect('/')
+        if user:
+            return redirect('/')
 
-    metadata = {
-        **base_metadata,
-        "css_paths": [*base_metadata["css_paths"], "ressources/css/auth.css"]
-    }
-    metadata["title"] = "Connexion"
-    metadata["auth_type"] = "login"
-    metadata["key"] = "auth"
+        metadata = {
+            **base_metadata,
+            "css_paths": [*base_metadata["css_paths"], "ressources/css/auth.css"]
+        }
+        metadata["title"] = "Connexion"
+        metadata["auth_type"] = "login"
+        metadata["key"] = "auth"
+        metadata["message"] = request.args.get("m")
+        metadata["status"] = request.args.get("status")
 
-    return render_template('/layouts/auth.html', **metadata)
+        return render_template('/layouts/auth.html', **metadata)
+    elif request.method == "POST":
+        email = request.form.get('email')
+        password = request.form.get('password')
+
+        if not all((email, password)):
+            return redirect('/login?m=Email and password are required&status=error')
+
+        headers = {'Content-Type': 'application/json'}
+        response = requests.post('http://microservices_authentification:8001/api/authentification/login',
+                                 json={
+                                     "email": email,
+                                     "password": password
+                                 },
+                                 headers=headers)
+        data = response.json()
+
+        if response.ok:
+            user = data.get("data")["user"]
+
+            res = make_response(redirect("/"))
+            res.set_cookie('user', json.dumps(user))
+
+            return res
+        else:
+            message = data.get("message")
+            return redirect(f"/login?m={message}&status=error")
 
 
 @app.route('/register')
@@ -114,13 +146,19 @@ def favorites():
 
 @app.route('/logout')
 def logout():
-    response = requests.get('http://microservices_authentification:8001/api/authentification/logout')
+    response = requests.get('http://microservices_authentification:8001/api/authentification/logout',
+                            cookies=request.cookies)
 
-    if response.status_code == 200:
-        return redirect('/', code=302)
+    if response.ok:
+        res = make_response(redirect("/", code=302))
+        res.delete_cookie('user')
+
+        return res
     else:
-        message = response.json().get('message', '')
-        return redirect(f"/error/404?message={message}", code=302)
+        message = response.json().get('message')
+        res = make_response(redirect(f"/?message={message}&status=error", code=302))
+
+        return res
 
 
 @app.route('/error/<code>')
