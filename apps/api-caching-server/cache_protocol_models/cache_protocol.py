@@ -64,7 +64,7 @@ class CacheProtocol(ABC):
 
     def get_cache_validity(self):
         current_time = time.time()
-        if current_time - self.CACHE_START_TIME > 300:
+        if current_time - self.CACHE_START_TIME > self.DELAY:
             self.set_cache_start(current_time)
             return True
         else:
@@ -73,6 +73,6 @@ class CacheProtocol(ABC):
     def get_cache(self) -> str:
         return self.CACHE
 
-    @abstractmethod()
+    @abstractmethod
     def set_cache(self):
         pass
