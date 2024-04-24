@@ -1,3 +1,4 @@
+import json
 import requests
 import os
 
@@ -16,12 +17,14 @@ class OpenDataCache(CacheProtocol):
     def set_cache(self) -> None:
         res = requests.get(self.API_URL).json()
         self.VELIB_COUNT = res.get('total_count')
+        offset = 100
 
-        for offset in range(0, self.VELIB_COUNT, 100):
+        while (offset < self.VELIB_COUNT):
             next_res = requests.get(self.API_URL + f"offset={offset}").json()
             res["results"].append(next_res)
+            offset += 100
 
-        self.CACHE = res
+        self.CACHE = json.dumps(res)
 
 
 if __name__ == "__main__":
@@ -29,3 +32,6 @@ if __name__ == "__main__":
                            PORT_DEFAULT,
                            "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/velib-disponibilite-en-temps-reel/records?limit=100",
                            300)
+
+    server.set_route('/', "GET")
+    server.start()

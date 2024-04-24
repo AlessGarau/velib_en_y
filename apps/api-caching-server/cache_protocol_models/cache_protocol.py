@@ -22,9 +22,10 @@ class CacheProtocol(ABC):
         self.routes = {}
 
         self.__set_socket()
-        self.__launch_server()
+        self.get_cache_validity()
+        self.set_cache()
 
-    def __launch_server(self):
+    def start(self):
         print(f"Server running on port {self.__PORT}")
         try:
             while True:
@@ -40,7 +41,7 @@ class CacheProtocol(ABC):
                     if not self.get_cache_validity():
                         self.set_cache()
                     print(self.get_cache())
-                    response.make_response(data="self.get_cache()", code=200)
+                    response.make_response(data=self.get_cache(), code=200)
                 else:
                     response.make_response(code=500)
 
@@ -68,9 +69,9 @@ class CacheProtocol(ABC):
         current_time = time.time()
         if current_time - self.CACHE_START_TIME > self.DELAY:
             self.set_cache_start(current_time)
-            return True
-        else:
             return False
+        else:
+            return True
 
     def get_cache(self) -> str:
         return self.CACHE
