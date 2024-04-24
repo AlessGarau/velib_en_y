@@ -89,10 +89,9 @@ services:
     ports:
       - "8004:8004"
     environment:
-      FLASK_APP: app.py
-      FLASK_RUN_HOST: 0.0.0.0
-      FLASK_RUN_PORT: 8004
-      FLASK_ENV: development
+      TCP_APP: app.py
+      TCP_HOST: 0.0.0.0
+      TCP_PORT: 8004
     volumes:
       - ./apps/api-caching-server:/app
     depends_on:

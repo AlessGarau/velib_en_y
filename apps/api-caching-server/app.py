@@ -3,8 +3,8 @@ import os
 
 from cache_protocol_models.cache_protocol import CacheProtocol
 
-ADDRESS_HOST = os.getenv('FLASK_RUN_HOST')
-PORT_DEFAULT = os.getenv('FLASK_RUN_PORT')
+ADDRESS_HOST = os.getenv('TCP_HOST')
+PORT_DEFAULT = int(os.getenv('TCP_PORT'))
 
 
 class OpenDataCache(CacheProtocol):
