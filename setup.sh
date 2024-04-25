@@ -15,6 +15,12 @@ print_help() {
 	echo "  run-microservices      Run the microservices"
 }
 
+clean_up() {
+	echo "Clean up"
+	lsof -ti :8000,8001,8002,8003,8004 | xargs kill
+}
+trap "clean_up" EXIT SIGINT SIGTERM INT
+
 create_and_activate_venv() {
 	$PYTHON -m venv velyb
 	source velyb/bin/activate
@@ -26,28 +32,51 @@ install_dependencies() {
 
 run_api_cache_server() {
 	cd $API_CACHE_DIR && $PYTHON app.py
+
+	wait
 }
 
 run_velyb_web_server() {
-	cd $WEB_SERVER_DIR && $FLASK_RUN --port 8000
+	cd $WEB_SERVER_DIR && $PYTHON app.py
+
+	wait
 }
 
 run_microservices() {
-	cd $MICROSERVICES_DIR/authentification && $FLASK_RUN --port 8001 &
-	cd $MICROSERVICES_DIR/favorite && $FLASK_RUN --port 8002 &
-	cd $MICROSERVICES_DIR/user && $FLASK_RUN --port 8003 &
+    # Store the current directory
+    original_dir=$(pwd)
+
+    # Generate database access layers for each microservice
+    source generate-database-access-layer.sh favorite
+    source generate-database-access-layer.sh authentification
+    source generate-database-access-layer.sh user
+
+    # Run each Flask app in the background with the correct directory navigation
+    (
+        cd $MICROSERVICES_DIR/authentification && $PYTHON app.py
+    ) &
+
+    (
+        cd $original_dir && cd $MICROSERVICES_DIR/favorite && $PYTHON app.py
+    ) &
+
+    (
+        cd $original_dir && cd $MICROSERVICES_DIR/user && $PYTHON app.py
+    ) &
+
+    # Navigate back to the original directory
+    cd $original_dir
+
+	wait 
 }
 
 run_all() {
 	install_dependencies
-	run_api_cache &
+	run_api_cache_server &
 	run_velyb_web_server &
 	run_microservices
-}
 
-stop_all() {
-	pkill -f "flask run" &
-	pkill -f "python app.py"
+	wait
 }
 
 case "$1" in
@@ -69,7 +98,13 @@ run-microservices)
 all)
 	run_all
 	;;
+clean)
+	clean_up
+	;;
 *)
 	print_help
 	;;
 esac
+
+
+# wait $pid0 $pid1 $pid2 $pid3 $pid4
