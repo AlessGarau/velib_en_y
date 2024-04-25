@@ -9,8 +9,8 @@ app = Flask(__name__,
 app.secret_key = b"4072bd90fe380021dd09cb1dc213a782b315656cf0e920866118ea0c2a3bf933"
 
 base_metadata = {
-    'css_paths': ['ressources/css/style.css', 'ressources/css/header.css', 'ressources/css/tab.css'],
-    'js_paths': ['ressources/js/common.js'],
+    'css_paths': ['ressources/css/style.css', 'ressources/css/header.css', 'ressources/css/tab.css', "ressources/css/map.css"],
+    'js_paths': ['/ressources/js/common.js', '/ressources/js/map.js'],
     'nav_items': {
         'unauthorized': [
             {'name': 'Accueil', 'link': '/', 'key': 'home'},
@@ -82,6 +82,7 @@ def login():
 
             res = make_response(redirect("/"))
             res.set_cookie('user', json.dumps(user))
+            res.set_cookie("user_id", str(user["id"]))
             session["user"] = user
 
             return res
@@ -153,6 +154,8 @@ def logout():
     if response.ok:
         res = make_response(redirect("/", code=302))
         res.delete_cookie('user')
+        res.delete_cookie('user_id')
+        
 
         return res
     else:
