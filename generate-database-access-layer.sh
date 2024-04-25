@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MICROSERVICES_DIR=./apps/microservices
+MICROSERVICES_DIR=apps/microservices
 
 copy_db_access_into() {
     cp -r database_access_layer $MICROSERVICES_DIR$1

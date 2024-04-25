@@ -79,6 +79,7 @@ h1 {
 
 #notification {
   position: absolute;
+  z-index: 2;
   padding: 8px 16px;
   width: 100%;
   text-align: center;
