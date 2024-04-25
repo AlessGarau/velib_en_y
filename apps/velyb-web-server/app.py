@@ -89,23 +89,52 @@ def login():
             return redirect(f"/login?m={message}&status=error")
 
 
-@app.route('/register')
+@app.route('/register', methods=["GET", "POST"])
 def register():
-    user = user_loaders.get_user_from_cookie()
+    if request.method == "GET":
+        
+        user = user_loaders.get_user_from_cookie()
 
-    if user:
-        return redirect('/')
+        if user:
+            return redirect('/')
 
-    metadata = {
-        **base_metadata,
-        "css_paths": [*base_metadata["css_paths"], "ressources/css/auth.css"]
-    }
-    metadata["title"] = "Inscription"
-    metadata["auth_type"] = "register"
-    metadata["key"] = "auth"
+        metadata = {
+            **base_metadata,
+            "css_paths": [*base_metadata["css_paths"], "ressources/css/auth.css"]
+        }
+        metadata["title"] = "Inscription"
+        metadata["auth_type"] = "register"
+        metadata["key"] = "auth"
 
-    return render_template('/layouts/auth.html', **metadata)
+        return render_template('/layouts/auth.html', **metadata)
+    
+    elif request.method == "POST":
+        
+        firstname = request.form.get("firstname")
+        lastname = request.form.get("lastname")
+        email = request.form.get("email")
+        password = request.form.get("password")
 
+        if not all((firstname, lastname, email, password)):
+            return redirect('/register?m=firstname, lastname, email and password are required&status=error')
+
+        headers = {'Content-Type': 'application/json'}
+        response = requests.post('http://microservices_authentification:8001/api/authentification/register',
+                                 json={
+                                     "firstname": firstname,
+                                     "lastname": lastname,
+                                     "email": email,
+                                     "password": password
+                                 },
+                                 headers=headers)
+        data = response.json()
+        if response.ok:
+            res = make_response(redirect("/"))
+            return res
+        
+        else:
+            message = data.get("message")
+            return redirect(f"/register?m={message}&status=error")
 
 @app.route('/settings')
 def settings():
