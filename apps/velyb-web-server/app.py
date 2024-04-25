@@ -131,7 +131,8 @@ def register():
                                  headers=headers)
         data = response.json()
         if response.ok:
-            res = make_response(redirect("/"))
+            message = data.get("message")
+            res = make_response(redirect(f"/login?m={message}&status=error"))
             return res
         
         else:
