@@ -84,12 +84,18 @@ h1 {
   width: 100%;
   text-align: center;
   font-size: var(--fs-small);
-  color: var(--clr-white-primary);
-  background-color: #fef0c7;
-  color: #dc6803;
   animation-duration: 3s;
   animation-name: notificationFade;
   animation-fill-mode: both;
+}
+
+.error {
+  background-color: #fef0c7;
+  color: #dc6803;
+}
+.success {
+  background-color: #eafdf1;
+  color: #039855;
 }
 
 .hide {

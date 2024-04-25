@@ -52,14 +52,13 @@ def login():
 
         metadata = {
             **base_metadata,
+            "title": "Connexion",
+            "auth_type": "login",
+            "key": "auth",
+            "message": request.args.get("m"),
+            "status": request.args.get("status"),
             "css_paths": [*base_metadata["css_paths"], "ressources/css/auth.css"]
         }
-        metadata["title"] = "Connexion"
-        metadata["auth_type"] = "login"
-        metadata["key"] = "auth"
-        metadata["message"] = request.args.get("m")
-        metadata["status"] = request.args.get("status")
-
         return render_template('/layouts/auth.html', **metadata)
     elif request.method == "POST":
         email = request.form.get('email')
@@ -91,23 +90,52 @@ def login():
             return redirect(f"/login?m={message}&status=error")
 
 
-@app.route('/register')
+@app.route('/register', methods=["GET", "POST"])
 def register():
-    user = user_loaders.get_user_from_cookie()
+    if request.method == "GET":
+        
+        user = user_loaders.get_user_from_cookie()
 
-    if user:
-        return redirect('/')
+        if user:
+            return redirect('/')
 
-    metadata = {
-        **base_metadata,
-        "css_paths": [*base_metadata["css_paths"], "ressources/css/auth.css"]
-    }
-    metadata["title"] = "Inscription"
-    metadata["auth_type"] = "register"
-    metadata["key"] = "auth"
+        metadata = {
+            **base_metadata,
+            "title": "Inscription",
+            "auth_type": "register",
+            "key": "auth",
+            "message": request.args.get("m"),
+            "status": request.args.get("status"),
+            "css_paths": [*base_metadata["css_paths"], "ressources/css/auth.css"]
+        }
 
-    return render_template('/layouts/auth.html', **metadata)
+        return render_template('/layouts/auth.html', **metadata)
+    
+    elif request.method == "POST":
+        
+        firstname = request.form.get("firstname")
+        lastname = request.form.get("lastname")
+        email = request.form.get("email")
+        password = request.form.get("password")
 
+        headers = {'Content-Type': 'application/json'}
+        response = requests.post('http://microservices_authentification:8001/api/authentification/register',
+                                 json={
+                                     "firstname": firstname,
+                                     "lastname": lastname,
+                                     "email": email,
+                                     "password": password
+                                 },
+                                 headers=headers)
+        data = response.json()
+        if response.ok:
+            message = data.get("message")
+            res = make_response(redirect(f"/login?m={message}&status=success"))
+            return res
+        
+        else:
+            message = data.get("message")
+            return redirect(f"/register?m={message}&status=error")
 
 @app.route('/settings')
 def settings():
@@ -119,11 +147,11 @@ def settings():
 
     metadata = {
         **base_metadata,
+        "user": user,
+        "title": "Réglages",
+        "key": "settings",
+        "setting_type": setting_type_param
     }
-    metadata["user"] = user
-    metadata["title"] = "Réglages"
-    metadata["key"] = "settings"
-    metadata["setting_type"] = setting_type_param
 
     return render_template('/layouts/settings.html', **metadata)
 
@@ -137,11 +165,11 @@ def favorites():
 
     metadata = {
         **base_metadata,
+        "user": user,
+        "title": "Favoris",
+        "key": "favorites",
+        "station_type": "favorites"
     }
-    metadata["user"] = user
-    metadata["title"] = "Favoris"
-    metadata["key"] = "favorites"
-    metadata["station_type"] = "favorites"
 
     return render_template('/layouts/favorites.html', **metadata)
 
