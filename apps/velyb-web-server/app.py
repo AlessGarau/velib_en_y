@@ -117,9 +117,6 @@ def register():
         email = request.form.get("email")
         password = request.form.get("password")
 
-        if not all((firstname, lastname, email, password)):
-            return redirect('/register?m=Firstname, lastname, email and password are required&status=error')
-
         headers = {'Content-Type': 'application/json'}
         response = requests.post('http://microservices_authentification:8001/api/authentification/register',
                                  json={
@@ -132,7 +129,7 @@ def register():
         data = response.json()
         if response.ok:
             message = data.get("message")
-            res = make_response(redirect(f"/login?m={message}&status=error"))
+            res = make_response(redirect(f"/login?m={message}&status=success"))
             return res
         
         else:

@@ -10,7 +10,7 @@
 <body>
     <main>
       {% if message and status %}
-      <p id="notification" {% if status == "error"%}class="error"{%endif%}>
+      <p id="notification" {% if status %}class={{status}}{% endif %}>
         {{message}}
       </p>
       {% endif %}
