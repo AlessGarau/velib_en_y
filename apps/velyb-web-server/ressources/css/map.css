@@ -9,6 +9,11 @@
 }
 
 #map-section {
+  #map {
+    position: absolute;
+    z-index: 1;
+  }
+
   .map-content {
     height: 100%;
     width: 100%;
