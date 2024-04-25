@@ -43,15 +43,12 @@ run_velyb_web_server() {
 }
 
 run_microservices() {
-    # Store the current directory
     original_dir=$(pwd)
 
-    # Generate database access layers for each microservice
     source generate-database-access-layer.sh favorite
     source generate-database-access-layer.sh authentification
     source generate-database-access-layer.sh user
 
-    # Run each Flask app in the background with the correct directory navigation
     (
         cd $MICROSERVICES_DIR/authentification && $PYTHON app.py
     ) &
@@ -64,7 +61,6 @@ run_microservices() {
         cd $original_dir && cd $MICROSERVICES_DIR/user && $PYTHON app.py
     ) &
 
-    # Navigate back to the original directory
     cd $original_dir
 
 	wait 
@@ -105,6 +101,3 @@ clean)
 	print_help
 	;;
 esac
-
-
-# wait $pid0 $pid1 $pid2 $pid3 $pid4
