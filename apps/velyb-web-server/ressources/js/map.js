@@ -1,5 +1,4 @@
 // TODO - Essayer de garder dernière position en localStorage
-// TODO - Si l'user est connecté, remplir la liste favorite_stations
 
 const user_id = document.cookie.split("user_id=")[1];
 const is_favorite_page = window.location.pathname.includes("favorites");
