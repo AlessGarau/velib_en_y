@@ -10,9 +10,11 @@ MICROSERVICES_DIR=apps/microservices
 print_help() {
 	echo "Available actions:"
 	echo "  install                Install dependencies"
+	echo "  all                    Run all the services at once"
 	echo "  run-api-cache          Run the API caching server"
 	echo "  run-velyb-web-server   Run the velyb web server"
 	echo "  run-microservices      Run the microservices"
+	echo "  clean                  Kills all processes related to the project"
 }
 
 clean_up() {
@@ -101,3 +103,5 @@ clean)
 	print_help
 	;;
 esac
+
+# Made with ❤ by heitzjulien & LTOssian 
