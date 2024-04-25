@@ -105,6 +105,8 @@ def register():
         metadata["title"] = "Inscription"
         metadata["auth_type"] = "register"
         metadata["key"] = "auth"
+        metadata["message"] = request.args.get("m")
+        metadata["status"] = request.args.get("status")
 
         return render_template('/layouts/auth.html', **metadata)
     
@@ -116,7 +118,7 @@ def register():
         password = request.form.get("password")
 
         if not all((firstname, lastname, email, password)):
-            return redirect('/register?m=firstname, lastname, email and password are required&status=error')
+            return redirect('/register?m=Firstname, lastname, email and password are required&status=error')
 
         headers = {'Content-Type': 'application/json'}
         response = requests.post('http://microservices_authentification:8001/api/authentification/register',
