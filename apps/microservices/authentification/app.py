@@ -52,13 +52,13 @@ def register():
         cursor = cnx.cursor(buffered=True)
 
         if not all((user_firstname, user_lastname, user_email, user_password)):
-            raise Exception('Credentials are not valid.')
+            raise Exception("Tous les champs doivent êtres remplis.")
 
         if not is_valid_email(user_email):
-            raise Exception('Email is invalid.')
+            raise Exception("Le format de l'adresse mail entré n'est pas valide.")
 
         if email_exists(user_email, cursor):
-            raise Exception('Email already exists.')
+            raise Exception("L'email entré est déja enregistré.")
 
         query = ("INSERT INTO `user` (firstname, lastname, profile_picture, email, password) VALUES (%s,%s, '',%s,%s)")
         cursor.execute(query, (user_firstname, user_lastname, user_email, user_password,))
@@ -68,7 +68,7 @@ def register():
         return jsonify({
             "data": cursor._last_insert_id,
             "success": True,
-            "message": "User succesfully registered"
+            "message": "Utilisateur crée avec succès."
         }), 201
     except BaseException as e:
         return jsonify({
@@ -91,13 +91,13 @@ def login():
         cursor = cnx.cursor(buffered=True)
 
         if not all((user_email, user_password)):
-            raise Exception("Credentials are not valid.")
+            raise Exception("Tous les champs doivent êtres remplis.")
 
         if not is_valid_email(user_email):
-            raise Exception('Email is invalid.')
+            raise Exception("Le format de l'adresse mail entré n'est pas valide.")
 
         if not email_exists(user_email, cursor):
-            raise Exception("This email doesnt exist.")
+            raise Exception("L'email entré n'est pas enregistré.")
 
         query = ("SELECT * FROM user WHERE email = %s")
         cursor.execute(query, (user_email,))
@@ -105,13 +105,13 @@ def login():
         user = User(*row)
 
         if user_password != user.password:
-            raise Exception("Email or password do not match.")
+            raise Exception("L'email et le mot de passe ne correspondent pas.")
 
         session["user"] = user.to_dict()
 
         response = make_response(jsonify({
             "success": True,
-            "message": "User successefully logged in.",
+            "message": "Connexion réussie.",
             "data": {
                 "user": user.to_dict()
             }
@@ -133,10 +133,10 @@ def logout():
 
     try:
         if 'user' not in session:
-            raise BaseException("No user session")
+            raise BaseException("Pas de session utilisateur.")
 
         response = make_response(jsonify({
-            "message": "User successfully disconnected"
+            "message": "Utilisateur déconnecté."
         }))
         session.clear()
 
