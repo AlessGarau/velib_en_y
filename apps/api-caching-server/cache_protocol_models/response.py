@@ -34,5 +34,9 @@ class Response:
             case _:
                 response += self.__HTTP[500]
 
-        self.client.send(response.encode())
-        self.client.close()
+        try:
+            self.client.send(response.encode())
+        except Exception as e:
+            print(f"Error sending response: {e}")
+        finally:
+            self.client.close()
