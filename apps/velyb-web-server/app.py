@@ -30,7 +30,6 @@ def index():
     user = user_loaders.get_user_from_cookie()
     metadata = {
         **base_metadata,
-
     }
 
     if user:
@@ -38,6 +37,9 @@ def index():
     metadata["title"] = "Accueil"
     metadata["key"] = "home"
     metadata["station_type"] = "all"
+
+    all_stations = requests.get("http://api-caching-server:8004")
+    metadata["all_stations"] = all_stations.json()["results"]
 
     return render_template('/layouts/index.html', **metadata)
 
@@ -140,6 +142,12 @@ def favorites():
     metadata["title"] = "Favoris"
     metadata["key"] = "favorites"
     metadata["station_type"] = "favorites"
+
+    all_stations = requests.get("http://api-caching-server:8004")
+    all_stations = all_stations.json()["results"]
+
+    # list of favorite stations + the data relative to them from all_stations (coordinates, nom_arrondissement_communes & name)
+    metadata["favorite_stations"] = []
 
     return render_template('/layouts/favorites.html', **metadata)
 

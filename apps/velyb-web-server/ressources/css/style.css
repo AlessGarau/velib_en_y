@@ -1,96 +1,158 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
 
 :root {
-    --clr-white-primary: #FAFAFA;
-    --clr-blue-primary: #3574D3;
-    --clr-black-primary: #182B1B;
-    --clr-gray-secondary: #8C8880;
-    --clr-blue-opacity-30: rgba(53, 116, 211, 0.3);
+  --clr-white-primary: #fafafa;
+  --clr-blue-primary: #3574d3;
+  --clr-black-primary: #182b1b;
+  --clr-gray-secondary: #8c8880;
+  --clr-blue-opacity-30: rgba(53, 116, 211, 0.3);
 
-    --fs-small: 16px;
-    --fs-medium: 24px;
-    --fs-large: 32px;
+  --fs-small: 16px;
+  --fs-medium: 24px;
+  --fs-large: 32px;
 
-    --fw-large: 600;
-    --fw-medium: 500;
+  --fw-large: 600;
+  --fw-medium: 500;
 }
 
-*, html {
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
+*,
+html {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 body {
-    background-color: var(--clr-white-primary);
-    font-size: var(--fs-medium);
-    color: var(--clr-black-primary);
-    font-family: "Inter", sans-serif;
+  background-color: var(--clr-white-primary);
+  font-size: var(--fs-medium);
+  color: var(--clr-black-primary);
+  font-family: "Inter", sans-serif;
 }
 
 /* Layout */
 main {
-    min-height: 100vh;
+  min-height: 100vh;
+  display: flex;
+
+  #map-section {
+    width: 100%;
+    background-color: antiquewhite;
+  }
+
+  #sidebar-section {
+    min-width: 400px;
+    max-height: 100vh;
+    padding: 16px;
     display: flex;
+    flex-flow: column;
+    gap: 32px;
+    align-items: center;
+    overflow-y: scroll;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
 
-    #map-section {
-        width: 100%;
-        background-color: antiquewhite;
+    ::-webkit-scrollbar { /* Chrome, Safari and Opera */
+      display: none;
     }
-
-    #sidebar-section {
-        min-width: 400px;
-        padding: 16px;
-        display: flex;
-        flex-flow: column;
-        gap: 32px;
-        align-items: center;
-    }
+  }
 }
 
 .sidebar-content {
+  display: flex;
+  flex-flow: column;
+  width: 100%;
+  gap: 16px;
+}
+.station-container {
+  padding: 0 16px;
+
+  .station-card {
     display: flex;
     flex-flow: column;
-    width: 100%;
-    gap: 16px;
+    gap: 10px;
+    padding: 16px 0;
+
+    .station-infos {
+      display: flex;
+      flex-flow: column;
+      padding: 8px;
+      gap: 8px;
+
+      p {
+        font-weight: var(--fw-medium);
+        font-size: var(--fs-small);
+        color: var(--clr-gray-secondary);
+      }
+    }
+
+    .actions {
+      display: flex;
+      flex-flow: row;
+      gap: 16px;
+      padding: 0 4px;
+
+      .favorite-icon {
+        width: 22px;
+        height: 22px;
+      }
+      .favorite-active {
+        fill: #FEDF89;
+    
+        path {
+          stroke: #FEDF89;
+        }
+      }
+    }
+  }
 }
 
 /* Utility */
 
 .divider {
-    height: 2px;
-    background-color: var(--clr-black-primary);
-    width: 100%;
+  height: 2px;
+  background-color: var(--clr-black-primary);
+  width: 100%;
 }
 
 .active-link {
-    background-color: var(--clr-blue-opacity-30);
+  background-color: var(--clr-blue-opacity-30);
 }
 
 h1 {
-    font-weight: var(--fw-medium);
-    font-size: var(--fs-large);
+  font-weight: var(--fw-medium);
+  font-size: var(--fs-large);
+}
+
+h3 {
+  font-weight: var(--fw-medium);
+  font-size: var(--fs-medium);
 }
 
 #notification {
-    position: absolute;
-    padding: 8px 16px;
-    width: 100%;
-    text-align: center;
-    font-size: var(--fs-small);
-    color: var(--clr-white-primary);
-    background-color: #F04438;
-    animation-duration: 3s;
-    animation-name: notificationFade;
-    animation-fill-mode: both;
+  position: absolute;
+  padding: 8px 16px;
+  width: 100%;
+  text-align: center;
+  font-size: var(--fs-small);
+  color: var(--clr-white-primary);
+  background-color: #f04438;
+  animation-duration: 3s;
+  animation-name: notificationFade;
+  animation-fill-mode: both;
 }
 
 .hide {
-    opacity: 0;
+  opacity: 0;
 }
 
 @keyframes notificationFade {
-    0% {opacity: 1;}
-    75% {opacity: 1;}
-    100% {opacity: 0;} 
- } 
+  0% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
