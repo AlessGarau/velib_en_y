@@ -64,6 +64,10 @@ main {
   width: 100%;
 }
 
+.cta {
+    color: var(--clr-white-primary);
+}
+
 .active-link {
   background-color: var(--clr-purple-opacity-30);
 }

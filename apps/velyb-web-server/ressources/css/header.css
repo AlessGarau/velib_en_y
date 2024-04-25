@@ -9,6 +9,7 @@
     padding: 16px 0;
     gap: 8px;
     display: flex;
+    align-items: center;
 
     .profile_picture {
       height: 53px;
@@ -45,6 +46,11 @@
 
       &:hover {
         background-color: var(--clr-purple-opacity-30);
+        color: var(--clr-white-primary);
+      }
+
+      &.active-link {
+        color: var(--clr-white-primary);
       }
     }
   }

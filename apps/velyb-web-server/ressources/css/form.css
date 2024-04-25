@@ -25,6 +25,7 @@ form {
     width: 100%;
     border: none;
     background-color: var(--clr-purple-opacity-30);
+    color: var(--clr-white-primary);
     font-size: var(--fs-medium);
   }
 }
