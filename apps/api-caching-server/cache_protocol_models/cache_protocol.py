@@ -13,6 +13,7 @@ class CacheProtocol(ABC):
     DELAY = 0
     CACHE_START_TIME = 0
     CACHE = ""
+    ALLOWED_ORIGINS = []
 
     def __init__(self, ADDRESS_HOST, PORT_DEFAULT, endpoint_to_cache: str, delay: int) -> None:
         self.__HOST = ADDRESS_HOST
@@ -31,12 +32,16 @@ class CacheProtocol(ABC):
             while True:
                 client, address = self.server_socket.accept()
                 request = Request(client.recv(1024).decode())
-                response = Response(client)
+                origin_header = request.get_origin_header()
+
+                response = Response(client, origin=origin_header if origin_header else None)
 
                 if not self.check_path(request.path):
                     response.make_response(data=json.dumps({'message': "This route doesn't exist"}), code=404)
                 elif not request.method in self.routes[request.path]:
                     response.make_response(code=500)
+                elif origin_header and not origin_header in self.ALLOWED_ORIGINS:
+                    response.make_response(code=300)
                 elif request.method in self.routes.values():
                     if not self.get_cache_validity():
                         self.set_cache()
@@ -73,6 +78,9 @@ class CacheProtocol(ABC):
 
     def get_cache(self) -> str:
         return self.CACHE
+
+    def add_origin(self, origin: str):
+        self.ALLOWED_ORIGINS.append(origin)
 
     @abstractmethod
     def set_cache(self):

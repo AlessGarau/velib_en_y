@@ -4,6 +4,8 @@ import os
 
 from cache_protocol_models.cache_protocol import CacheProtocol
 
+# ADDRESS_HOST = '0.0.0.0'
+# PORT_DEFAULT = 8004
 ADDRESS_HOST = os.getenv('TCP_HOST')
 PORT_DEFAULT = int(os.getenv('TCP_PORT'))
 
@@ -34,4 +36,7 @@ if __name__ == "__main__":
                            300)
 
     server.set_route('/', "GET")
+    server.add_origin('http://localhost:8000')
+    server.add_origin('http://localhost:8004')
+    server.add_origin('http://velyb-web-server:8000')
     server.start()
