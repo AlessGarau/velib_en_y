@@ -1,16 +1,61 @@
 :root {
-    --map-tiles-filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0) brightness(0.4);
+  --map-tiles-filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0) brightness(0.4);
 }
 
 @media (prefers-color-scheme: dark) {
-    .map-tiles {
-        filter:var(--map-tiles-filter, none);
-	}
+  .map-tiles {
+    filter: var(--map-tiles-filter, none);
+  }
 }
 
 #map-section {
-    .map-content { 
-        height: 100%; 
-        width: 100%;
-    }
+  .map-content {
+    height: 100%;
+    width: 100%;
+  }
+}
+
+.marker-cluster-small {
+  background-color: #ecfdf3;
+
+  div {
+    background-color: #d1fadf;
+    color: #039855;
+  }
+}
+
+.marker-cluster-medium {
+  background-color: #fffaeb;
+
+  div {
+    background-color: #fef0c7;
+    color: #dc6803;
+  }
+}
+.marker-cluster-large {
+  background-color: #fef3f2;
+
+  div {
+    background-color: #fee4e2;
+    color: #d92d20;
+  }
+}
+
+.marker-cluster {
+  background-clip: padding-box;
+  border-radius: 20px;
+}
+
+.marker-cluster div {
+  width: 30px;
+  height: 30px;
+  margin-left: 5px;
+  margin-top: 5px;
+  text-align: center;
+  border-radius: 15px;
+}
+.marker-cluster span {
+  line-height: 30px;
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
 }
