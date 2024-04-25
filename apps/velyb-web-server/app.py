@@ -82,6 +82,7 @@ def login():
 
             res = make_response(redirect("/"))
             res.set_cookie('user', json.dumps(user))
+            res.set_cookie("user_id", str(user["id"]))
             session["user"] = user
 
             return res
@@ -153,6 +154,8 @@ def logout():
     if response.ok:
         res = make_response(redirect("/", code=302))
         res.delete_cookie('user')
+        res.delete_cookie('user_id')
+        
 
         return res
     else:
