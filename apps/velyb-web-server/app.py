@@ -82,6 +82,7 @@ def login():
 
             res = make_response(redirect("/"))
             res.set_cookie('user', json.dumps(user))
+            session["user"] = user
 
             return res
         else:
