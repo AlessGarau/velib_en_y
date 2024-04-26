@@ -55,10 +55,10 @@ def register():
             raise Exception("Tous les champs doivent êtres remplis.")
 
         if not is_valid_email(user_email):
-            raise Exception("Le format de l'adresse mail entré n'est pas valide.")
+            raise Exception("Adresse mail invalide. Veuillez réessayer.")
 
         if email_exists(user_email, cursor):
-            raise Exception("L'email entré est déja enregistré.")
+            raise Exception("Cet utilisateur existe déjà.")
 
         query = ("INSERT INTO `user` (firstname, lastname, profile_picture, email, password) VALUES (%s,%s, '',%s,%s)")
         cursor.execute(query, (user_firstname, user_lastname, user_email, user_password,))
@@ -68,7 +68,7 @@ def register():
         return jsonify({
             "data": cursor._last_insert_id,
             "success": True,
-            "message": "Utilisateur crée avec succès."
+            "message": "Utilisateur enregistré avec succès."
         }), 201
     except BaseException as e:
         return jsonify({
@@ -94,10 +94,10 @@ def login():
             raise Exception("Tous les champs doivent êtres remplis.")
 
         if not is_valid_email(user_email):
-            raise Exception("Le format de l'adresse mail entré n'est pas valide.")
+            raise Exception("Adresse mail invalide. Veuillez réessayer.")
 
         if not email_exists(user_email, cursor):
-            raise Exception("L'email entré n'est pas enregistré.")
+            raise Exception("Cet utilisateur n'existe pas.")
 
         query = ("SELECT * FROM user WHERE email = %s")
         cursor.execute(query, (user_email,))
@@ -105,7 +105,7 @@ def login():
         user = User(*row)
 
         if user_password != user.password:
-            raise Exception("L'email et le mot de passe ne correspondent pas.")
+            raise Exception("Mot de passe incorrecte. Veuillez réessayer.")
 
         session["user"] = user.to_dict()
 
@@ -133,10 +133,10 @@ def logout():
 
     try:
         if 'user' not in session:
-            raise BaseException("Pas de session utilisateur.")
+            raise BaseException("Cet utilisateur n'est pas connecté.")
 
         response = make_response(jsonify({
-            "message": "Utilisateur déconnecté."
+            "message": "Déconnexion réussie."
         }))
         session.clear()
 

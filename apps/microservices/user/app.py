@@ -41,7 +41,7 @@ def user_profile():
         cursor = cnx.cursor(buffered=True)
 
         if not user_exists(user_id, cursor):
-            raise BaseException("Erreur lors de la recherche de l'utilisateur.")
+            raise BaseException("Cet utilisateur n'existe pas.")
         select_query = """
             SELECT *
             FROM user
@@ -78,7 +78,7 @@ def update_user():
         cursor = cnx.cursor(buffered=True)
 
         if not user_exists(user_id, cursor):
-            raise BaseException("Erreur lors de la recherche de l'utilisateur.")
+            raise BaseException("Cet utilisateur n'existe pas.")
 
         match type:
             case "password":
@@ -102,7 +102,7 @@ def update_user():
                 rows = cursor.fetchall()
 
                 if len(rows) == 0:
-                    raise BaseException("Erreur lors de la recherche de l'utilisateur.")
+                    raise BaseException("Ancien mot de passe incorrecte. Veuillez réessayer.")
 
                 hashed_new_password = to_hash(new_password)
                 update_query = """
@@ -173,7 +173,7 @@ def delete_user(user_id):
         cursor = cnx.cursor(buffered=True)
 
         if not user_exists(user_id, cursor):
-            raise BaseException("Erreur lors de la recherche de l'utilisateur.")
+            raise BaseException("Cet utilisateur n'existe pas.")
 
         delete_query = """
             DELETE FROM user 

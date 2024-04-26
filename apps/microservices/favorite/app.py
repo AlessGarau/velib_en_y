@@ -63,7 +63,7 @@ def user_favorites():
         cursor = cnx.cursor(buffered=True)
 
         if not user_exists(user_id, cursor):
-            raise BaseException("")
+            raise BaseException("Cet utilisateur n'existe pas.")
 
         select_query = """
             SELECT *
@@ -104,10 +104,10 @@ def delete_favorite(station_code: str):
         cursor = cnx.cursor(buffered=True)
 
         if not (user_exists(user_id, cursor)):
-            raise BaseException("Erreur lors de la recherche de l'utilisateur dans la base de donnée.")
+            raise BaseException("Cet utilisateur n'existe pas.")
 
         if not favorite_station_exists(user_id, station_code, cursor):
-            raise BaseException("Cette station ne fait pas partie de vos favoris.")
+            raise BaseException(f"La station {station_code} ne se trouve pas dans vos favoris.")
 
         delete_query = """
             DELETE FROM favorite_station 
@@ -145,7 +145,7 @@ def update_favorite(station_code):
             raise BaseException("Veuillez remplir l'intégralité des champs.")
 
         if not user_exists(user_id, cursor):
-            raise BaseException("Erreur lors de la recherche de l'utilisateur.")
+            raise BaseException("Cet utilisateur n'existe pas.")
 
         if not favorite_station_exists(user_id, station_code, cursor, True):
             raise BaseException(f"La station {station_code} ne se trouve pas dans vos favoris.")
@@ -196,7 +196,7 @@ def create_favorite():
         cursor = cnx.cursor(buffered=True)
 
         if not (user_exists(user_id, cursor)):
-            raise BaseException("L'utilisateur demandé n'existe pas.")
+            raise BaseException("Cet utilisateur n'existe pas.")
 
         if not all((station_code, user_id, name, picture, name_custom,)):
             raise BaseException("Veuillez remplir l'intégralité des champs.")
