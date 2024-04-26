@@ -45,30 +45,31 @@ run_velyb_web_server() {
 }
 
 run_microservices() {
-    original_dir=$(pwd)
+	original_dir=$(pwd)
 
-    source generate-database-access-layer.sh favorite
-    source generate-database-access-layer.sh authentification
-    source generate-database-access-layer.sh user
+	source generate-database-access-layer.sh favorite
+	source generate-database-access-layer.sh authentification
+	source generate-database-access-layer.sh user
 
-    (
-        cd $MICROSERVICES_DIR/authentification && $PYTHON app.py
-    ) &
+	(
+		cd $MICROSERVICES_DIR/authentification && $PYTHON app.py
+	) &
 
-    (
-        cd $original_dir && cd $MICROSERVICES_DIR/favorite && $PYTHON app.py
-    ) &
+	(
+		cd $original_dir && cd $MICROSERVICES_DIR/favorite && $PYTHON app.py
+	) &
 
-    (
-        cd $original_dir && cd $MICROSERVICES_DIR/user && $PYTHON app.py
-    ) &
+	(
+		cd $original_dir && cd $MICROSERVICES_DIR/user && $PYTHON app.py
+	) &
 
-    cd $original_dir
+	cd $original_dir
 
-	wait 
+	wait
 }
 
 run_all() {
+	create_and_activate_venv
 	install_dependencies
 	run_api_cache_server &
 	run_velyb_web_server &
@@ -104,4 +105,5 @@ clean)
 	;;
 esac
 
-# Made with ❤ by heitzjulien & LTOssian 
+# Made with ❤ by heitzjulien & LTOssian
+
