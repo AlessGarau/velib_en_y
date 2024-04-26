@@ -1,3 +1,15 @@
-<div class="sidebar-content setting-component">
-  <h2>{{ title }}</h2>
-</div>
+  <form method="post">
+    <div>
+      <label for="old-password">Ancien mot de passe</label>
+      <input type="password" id="old-password" name="old-password">
+    </div>
+    <div>
+      <label for="new-password">Nouveau mot de passe</label>
+      <input type="password" id="new-password" name="new-password">
+    </div>
+    <div>
+      <label for="conf-password">Confirmer le mot de passe</label>
+      <input type="password" id="conf-password" name="conf-password">
+    </div>
+    <button type="submit">Enregistrer les changements</button>
+  </form>
