@@ -9,8 +9,8 @@ app = Flask(__name__,
 app.secret_key = b"4072bd90fe380021dd09cb1dc213a782b315656cf0e920866118ea0c2a3bf933"
 
 base_metadata = {
-    'css_paths': ['ressources/css/style.css', 'ressources/css/header.css', 'ressources/css/tab.css'],
-    'js_paths': ['/ressources/js/common.js'],
+    'css_paths': ['ressources/css/style.css', 'ressources/css/header.css', 'ressources/css/tab.css', "ressources/css/map.css"],
+    'js_paths': ['/ressources/js/common.js', '/ressources/js/map.js'],
     'nav_items': {
         'unauthorized': [
             {'name': 'Accueil', 'link': '/', 'key': 'home'},
@@ -54,14 +54,13 @@ def login():
 
         metadata = {
             **base_metadata,
+            "title": "Connexion",
+            "auth_type": "login",
+            "key": "auth",
+            "message": request.args.get("m"),
+            "status": request.args.get("status"),
             "css_paths": [*base_metadata["css_paths"], "ressources/css/auth.css"]
         }
-        metadata["title"] = "Connexion"
-        metadata["auth_type"] = "login"
-        metadata["key"] = "auth"
-        metadata["message"] = request.args.get("m")
-        metadata["status"] = request.args.get("status")
-
         return render_template('/layouts/auth.html', **metadata)
     elif request.method == "POST":
         email = request.form.get('email')
@@ -84,6 +83,8 @@ def login():
 
             res = make_response(redirect("/"))
             res.set_cookie('user', json.dumps(user))
+            res.set_cookie("user_id", str(user["id"]))
+            session["user"] = user
 
             return res
         else:
@@ -91,23 +92,52 @@ def login():
             return redirect(f"/login?m={message}&status=error")
 
 
-@app.route('/register')
+@app.route('/register', methods=["GET", "POST"])
 def register():
-    user = user_loaders.get_user_from_cookie()
+    if request.method == "GET":
+        
+        user = user_loaders.get_user_from_cookie()
 
-    if user:
-        return redirect('/')
+        if user:
+            return redirect('/')
 
-    metadata = {
-        **base_metadata,
-        "css_paths": [*base_metadata["css_paths"], "ressources/css/auth.css"]
-    }
-    metadata["title"] = "Inscription"
-    metadata["auth_type"] = "register"
-    metadata["key"] = "auth"
+        metadata = {
+            **base_metadata,
+            "title": "Inscription",
+            "auth_type": "register",
+            "key": "auth",
+            "message": request.args.get("m"),
+            "status": request.args.get("status"),
+            "css_paths": [*base_metadata["css_paths"], "ressources/css/auth.css"]
+        }
 
-    return render_template('/layouts/auth.html', **metadata)
+        return render_template('/layouts/auth.html', **metadata)
+    
+    elif request.method == "POST":
+        
+        firstname = request.form.get("firstname")
+        lastname = request.form.get("lastname")
+        email = request.form.get("email")
+        password = request.form.get("password")
 
+        headers = {'Content-Type': 'application/json'}
+        response = requests.post('http://microservices_authentification:8001/api/authentification/register',
+                                 json={
+                                     "firstname": firstname,
+                                     "lastname": lastname,
+                                     "email": email,
+                                     "password": password
+                                 },
+                                 headers=headers)
+        data = response.json()
+        if response.ok:
+            message = data.get("message")
+            res = make_response(redirect(f"/login?m={message}&status=success"))
+            return res
+        
+        else:
+            message = data.get("message")
+            return redirect(f"/register?m={message}&status=error")
 
 @app.route('/settings')
 def settings():
@@ -119,11 +149,11 @@ def settings():
 
     metadata = {
         **base_metadata,
+        "user": user,
+        "title": "Réglages",
+        "key": "settings",
+        "setting_type": setting_type_param
     }
-    metadata["user"] = user
-    metadata["title"] = "Réglages"
-    metadata["key"] = "settings"
-    metadata["setting_type"] = setting_type_param
 
     return render_template('/layouts/settings.html', **metadata)
 
@@ -137,11 +167,11 @@ def favorites():
 
     metadata = {
         **base_metadata,
+        "user": user,
+        "title": "Favoris",
+        "key": "favorites",
+        "station_type": "favorites"
     }
-    metadata["user"] = user
-    metadata["title"] = "Favoris"
-    metadata["key"] = "favorites"
-    metadata["station_type"] = "favorites"
 
     all_stations = requests.get("http://api-caching-server:8004")
     all_stations = all_stations.json()["results"]
@@ -160,6 +190,8 @@ def logout():
     if response.ok:
         res = make_response(redirect("/", code=302))
         res.delete_cookie('user')
+        res.delete_cookie('user_id')
+        
 
         return res
     else:
@@ -175,4 +207,4 @@ def error(code=404):
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(port=8000)

@@ -11,5 +11,9 @@
         display: flex;
         align-items: center;
         justify-content: center;
+
+        &.active-link {
+            color: var(--clr-white-primary);
+        }
     }
 }

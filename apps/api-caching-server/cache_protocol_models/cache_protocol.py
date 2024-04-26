@@ -40,7 +40,7 @@ class CacheProtocol(ABC):
                     response.make_response(data=json.dumps({'message': "This route doesn't exist"}), code=404)
                 elif not request.method in self.routes[request.path]:
                     response.make_response(code=500)
-                elif not origin_header:
+                elif origin_header and not origin_header in self.ALLOWED_ORIGINS:
                     response.make_response(code=300)
                 elif request.method in self.routes.values():
                     if not self.get_cache_validity():
