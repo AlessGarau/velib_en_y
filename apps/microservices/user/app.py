@@ -2,14 +2,12 @@ import json
 import hashlib
 
 from flask import Flask, request, jsonify
-from flask_cors import CORS
 from mysql.connector.cursor import MySQLCursor
 
 from database_access_layer.database import close_connection, connect_to_database
 from database_access_layer.models.user import User
 
 app = Flask(__name__)
-CORS(app)
 cnx = connect_to_database()
 
 

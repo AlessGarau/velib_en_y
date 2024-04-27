@@ -235,5 +235,6 @@ def after_request(response):
 
 
 app.after_request(after_request)
+
 if __name__ == '__main__':
     app.run(port=8002)
