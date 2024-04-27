@@ -1,5 +1,4 @@
-// Already called in map.py
-// const user_id = document.cookie.split("user_id=")[1];
+const user_id = document.cookie.split("user_id=")[1];
 
 async function addFavorite(station_code, name) {
     try {
@@ -7,26 +6,24 @@ async function addFavorite(station_code, name) {
             user_id: user_id,
             station_code: station_code,
             name: name,
-            picture: "", // N'est même pas sur la maquette donc pas utilisé mais ok
+            picture: "x", // N'est même pas sur la maquette donc pas utilisé mais ok
             name_custom: name
         };
 
-        const response = await fetch('http://localhost:8002/api/favorites/', {
+        const res = await fetch('http://localhost:8002/api/favorites/', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify(data)
         });
-
-        const responseData = await response.json();
         
-        if (responseData.success) {
-            console.log(responseData.data);
-            // window.location.href = "/favorites"
-        } else {
-            console.error("Erreur lors de l'ajout du favori :", responseData.message);
+        const resData = await res.json();
+        if (!res.ok) {
+            console.error("Erreur lors de l'ajout du favori:", resData.message);
         }
+        
+        console.log(resData.data);
     } catch (error) {
         console.error("Erreur lors de l'ajout du favori :", error);
     }

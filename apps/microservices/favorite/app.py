@@ -231,6 +231,8 @@ def create_favorite():
 def after_request(response):
     header = response.headers
     header['Access-Control-Allow-Origin'] = 'http://localhost:8000'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+
     return response
 
 
