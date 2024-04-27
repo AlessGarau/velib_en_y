@@ -72,15 +72,15 @@ class VelybMap {
         const icon = this.isFavoriteMap ? favoriteStationIcon : stationIcon;
         const marker = L.marker(coordinates, {icon : icon});
         marker.bindPopup(`
-          <button onclick="addFavorite(${station.stationcode}, '${station.name}')">Ajouter aux favoris</button>
-          <br />
-          <b>${station.name}</b>
-          <br/>
-          Nombre de vélos disponibles : ${station.numbikesavailable}
-          <br/>
-          Type : Mécanique : ${station.mechanical}/ Électrique : ${station.ebike}
-          <br/>
-          Nombre de places libres : ${station.numdocksavailable}
+        <b>${station.name}</b>
+        <br/>
+        Nombre de vélos disponibles : ${station.numbikesavailable}
+        <br/>
+        Type : Mécanique : ${station.mechanical}/ Électrique : ${station.ebike}
+        <br/>
+        Nombre de places libres : ${station.numdocksavailable}
+        <br />
+        <button class="cta-popup" onclick="addFavorite(${station.stationcode}, '${station.name}')">Ajouter aux favoris</button>
           `);
 
         mcg.addLayer(marker);
