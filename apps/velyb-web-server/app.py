@@ -9,7 +9,7 @@ app = Flask(__name__,
 app.secret_key = b"4072bd90fe380021dd09cb1dc213a782b315656cf0e920866118ea0c2a3bf933"
 
 base_metadata = {
-    'css_paths': ['ressources/css/style.css', 'ressources/css/header.css', 'ressources/css/tab.css', "ressources/css/map.css"],
+    'css_paths': ['ressources/css/style.css', 'ressources/css/header.css', 'ressources/css/tab.css', "ressources/css/map.css", "ressources/css/form.css"],
     'js_paths': ['/ressources/js/common.js', '/ressources/js/map.js'],
     'nav_items': {
         'unauthorized': [
@@ -137,7 +137,7 @@ def register():
             message = data.get("message")
             return redirect(f"/register?m={message}&status=error")
 
-@app.route('/settings')
+@app.route('/settings', methods=['GET', 'POST'])
 def settings():
     user = user_loaders.get_user_from_cookie()
     setting_type_param = request.args.get("type")
@@ -153,8 +153,62 @@ def settings():
         "setting_type": setting_type_param
     }
 
-    return render_template('/layouts/settings.html', **metadata)
+    if setting_type_param == "profile":
+        if request.method == "GET":
+            return render_template('/layouts/settings.html', **metadata)
 
+        elif request.method == "POST":
+            firstname = request.form.get('firstname')
+            lastname = request.form.get('lastname')
+
+            headers = {'Content-Type': 'application/json'}
+            response = requests.post('http://microservices_user:8003/api/users?type=profile',
+                                    json={
+                                        "firstname": firstname,
+                                        "lastname": lastname,
+                                        "user_id": str(user["id"])
+                                    },
+                                    headers=headers)
+            data = response.json()
+
+            if response.ok:
+                metadata["user"] = data.get("data")
+                res = make_response(redirect(f"/settings?type=profile"))
+                res.delete_cookie('user')
+                res.set_cookie('user', json.dumps(metadata["user"]))
+                return res
+            else:
+                return render_template('/layouts/settings.html', **metadata)
+
+    
+    elif setting_type_param == "confidential":
+        if request.method == "GET":
+            return render_template('/layouts/settings.html', **metadata)
+            
+        elif request.method == "POST":
+            old_password = request.form.get('old_password')
+            new_password = request.form.get('new_password')
+            new_password_repeated = request.form.get('new_password_repeated')
+
+
+            headers = {'Content-Type': 'application/json'}
+            response = requests.post('http://microservices_user:8003/api/users?type=password',
+                                    json={
+                                        "old_password": old_password,
+                                        "new_password": new_password,
+                                        "new_password_repeated": new_password_repeated,
+                                        "user_id": str(user["id"])
+
+                                    },
+                                    headers=headers)
+            data = response.json()
+            print(data)
+
+            if response.ok:
+                return render_template('/layouts/settings.html', **metadata)
+            else:
+                return render_template('/layouts/settings.html', **metadata)
+    
 
 @app.route('/favorites')
 def favorites():

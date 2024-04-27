@@ -66,7 +66,7 @@ def user_profile():
         close_connection(cnx)
 
 
-@app.route("/api/users", methods=['PUT'])
+@app.route("/api/users", methods=['POST'])
 def update_user():
     cnx = connect_to_database()
 
@@ -123,7 +123,7 @@ def update_user():
                 firstname = body.get('firstname')
                 lastname = body.get('lastname')
                 profile_picture = body.get('profile_picture') if body.get('profile_picture') else ""
-
+                
                 if not all((firstname, lastname)):
                     raise BaseException("Veuillez remplir l'intégralité des champs.")
 

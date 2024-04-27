@@ -1,28 +1,12 @@
-<div class="sidebar-content setting-component">
-  <form method="POST">
-    <div>
-      <label for="firstname">Prénom</label>
-      <input
-        type="firstname"
-        id="firstname"
-        name="firstname"
-        value={{user["firstname"]}}
-      />
-    </div>
-      <div>
-      <label for="lastname">Nom</label>
-      <input
-        type="lastname"
-        id="lastname"
-        name="lastname"
-        value={{user["lastname"]}}
-      />
-    </div>
-    <div>
-      <label for="profile_picture">Photo de profil</label>
-      <input type="file" id="profile_picture" name="profile_picture" disabled />
-      <img {% if user["profile_picture"] %}class="profile_picture"{% endif %} src={{ user["profile_picture"] if user["profile_picture"] else "ressources/img/authorized_user.svg" }}>
-    </div>
-    <button type="submit">Enregistrer les changements</button>
-  </form>
-</div>
+<form method="POST">
+  <div>
+    <label for="firstname">Prénom</label>
+    <input type="firstname" id="firstname" name="firstname"
+    value={{user["firstname"]}} />
+  </div>
+  <div>
+    <label for="lastname">Nom</label>
+    <input type="lastname" id="lastname" name="lastname" value={{user["lastname"]}} />
+  </div>
+  <button type="submit">Enregistrer les changements</button>
+</form>
