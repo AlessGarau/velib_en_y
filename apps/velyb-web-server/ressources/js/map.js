@@ -4,7 +4,7 @@ const userId = document.cookie.split("user_id=")[1];
 const isFavoritePage = window.location.pathname.includes("favorites");
 
 // Set initial view
-const map = L.map("map").setView([48.8566, 2.3522], 13);
+const map = L.map("map").setView([48.8566, 2.3522], 11);
 const mcg = L.markerClusterGroup();
 L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
