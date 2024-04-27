@@ -1,7 +1,8 @@
 import json
-from flask import Flask, make_response, redirect, render_template, request, session
 import requests
 import requests.cookies
+
+from flask import Flask, make_response, redirect, render_template, request, session
 from loaders import user_loaders
 
 app = Flask(__name__,
@@ -95,7 +96,6 @@ def login():
 @app.route('/register', methods=["GET", "POST"])
 def register():
     if request.method == "GET":
-
         user = user_loaders.get_user_from_cookie()
 
         if user:
@@ -114,7 +114,6 @@ def register():
         return render_template('/layouts/auth.html', **metadata)
 
     elif request.method == "POST":
-
         firstname = request.form.get("firstname")
         lastname = request.form.get("lastname")
         email = request.form.get("email")
@@ -134,7 +133,6 @@ def register():
             message = data.get("message")
             res = make_response(redirect(f"/login?m={message}&status=success"))
             return res
-
         else:
             message = data.get("message")
             return redirect(f"/register?m={message}&status=error")

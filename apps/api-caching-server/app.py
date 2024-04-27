@@ -37,6 +37,7 @@ if __name__ == "__main__":
 
     server.set_route('/', "GET")
     server.add_origin('http://localhost:8000')
+    server.add_origin('http://127.0.0.1:5000')
     server.add_origin('http://localhost:8004')
     server.add_origin('http://velyb-web-server:8000')
     server.start()

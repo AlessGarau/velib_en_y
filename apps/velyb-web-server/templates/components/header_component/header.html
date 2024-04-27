@@ -24,7 +24,7 @@
     <nav>
         {% for url in nav_urls %}
         <a href="{{ url.link }}" 
-            {% if url.key == key %}class="active-link"{%endif%}>
+            {% if url.key == key or (url.key == 'home' and key == 'favorites') %}class="active-link"{%endif%}>
             {{ url.name }}
         </a>
         {%if not loop.last%}
