@@ -1,7 +1,8 @@
 import json
-from flask import Flask, make_response, redirect, render_template, request, session
 import requests
 import requests.cookies
+
+from flask import Flask, make_response, redirect, render_template, request, session
 from loaders import user_loaders
 
 app = Flask(__name__,

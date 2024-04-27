@@ -52,12 +52,9 @@ def user_exists(user_id: int, cursor: MySQLCursor) -> bool:
     return len(user) > 0
 
 
-@app.route('/api/favorites', methods=['GET'])
-def user_favorites():
+@app.route('/api/favorites/<user_id>', methods=['GET'])
+def user_favorites(user_id):
     cnx = connect_to_database()
-
-    body = request.get_json()
-    user_id = body.get('user_id')
 
     try:
         cursor = cnx.cursor(buffered=True)
@@ -230,6 +227,14 @@ def create_favorite():
     finally:
         close_connection(cnx)
 
+
+def after_request(response):
+    header = response.headers
+    header['Access-Control-Allow-Origin'] = 'http://localhost:8000'
+    return response
+
+
+app.after_request(after_request)
 
 if __name__ == '__main__':
     app.run(port=8002)
