@@ -109,4 +109,3 @@ class VelybMap {
 
 const velybMap = new VelybMap("http://localhost:8004/", userId ? userId : null, isFavoritePage);
 velybMap.setStations();
-

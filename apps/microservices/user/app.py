@@ -41,7 +41,7 @@ def user_profile():
         cursor = cnx.cursor(buffered=True)
 
         if not user_exists(user_id, cursor):
-            raise BaseException("Credentials are not valid. Check the user's validity.")
+            raise BaseException("Cet utilisateur n'existe pas.")
         select_query = """
             SELECT *
             FROM user
@@ -78,7 +78,7 @@ def update_user():
         cursor = cnx.cursor(buffered=True)
 
         if not user_exists(user_id, cursor):
-            raise BaseException("Credentials are not valid. Check the user's validity.")
+            raise BaseException("Cet utilisateur n'existe pas.")
 
         match type:
             case "password":
@@ -87,10 +87,10 @@ def update_user():
                 old_password = body.get("old_password")
 
                 if not all((new_password, new_password_repeated, old_password)):
-                    raise BaseException("Credentials are not valid.")
+                    raise BaseException("Veuillez remplir l'intégralité des champs.")
 
                 if new_password != new_password_repeated:
-                    raise BaseException("Credentials are not valid. Verify passwords")
+                    raise BaseException("Le nouveau mot de passe et sa vérification ne correspondent pas.")
 
                 hashed_old_password = to_hash(old_password)
                 select_user = """
@@ -102,7 +102,7 @@ def update_user():
                 rows = cursor.fetchall()
 
                 if len(rows) == 0:
-                    raise BaseException("Credentials are not valid. Verify passwords")
+                    raise BaseException("Ancien mot de passe incorrecte. Veuillez réessayer.")
 
                 hashed_new_password = to_hash(new_password)
                 update_query = """
@@ -125,7 +125,7 @@ def update_user():
                 profile_picture = body.get('profile_picture') if body.get('profile_picture') else ""
 
                 if not all((firstname, lastname)):
-                    raise BaseException("Credentials are not valid.")
+                    raise BaseException("Veuillez remplir l'intégralité des champs.")
 
                 update_query = """
                     UPDATE user
@@ -153,7 +153,7 @@ def update_user():
                 return jsonify(
                     {
                         "success": False,
-                        "message": f'The type of update "{type}" is not known'
+                        "message": f"Type de changement de profile inconnu."
                     }
                 ), 404
     except BaseException as e:
@@ -173,7 +173,7 @@ def delete_user(user_id):
         cursor = cnx.cursor(buffered=True)
 
         if not user_exists(user_id, cursor):
-            raise BaseException("Credentials are not valid. Check the user's validity.")
+            raise BaseException("Cet utilisateur n'existe pas.")
 
         delete_query = """
             DELETE FROM user 
