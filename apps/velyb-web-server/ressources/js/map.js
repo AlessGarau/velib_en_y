@@ -2,6 +2,7 @@
 
 const userId = document.cookie.split("user_id=")[1];
 const isFavoritePage = window.location.pathname.includes("favorites");
+const isListPage = isFavoritePage|| window.location.pathname === "/"
 
 // Set initial view
 const map = L.map("map").setView([48.8566, 2.3522], 13);
@@ -30,10 +31,11 @@ class VelybMap {
   favoriteStations = new Array();
   totalCount = 0;
 
-  constructor(dataUrl, userId = null, isFavoriteMap) {
+  constructor(dataUrl, userId = null, isFavoriteMap, isListPage) {
     this.dataUrl = dataUrl;
     this.userId = userId;
     this.isFavoriteMap = isFavoriteMap;
+    this.isListPage = isListPage;
   }
 
   async setStations() {
@@ -70,7 +72,7 @@ class VelybMap {
       opendata.map((station) => {
         const coordinates = [station.coordonnees_geo.lat, station.coordonnees_geo.lon];
         const icon = this.isFavoriteMap ? favoriteStationIcon : stationIcon;
-        const marker = L.marker(coordinates, {icon : icon});
+        const marker = L.marker(coordinates, {icon : icon}).on('click', (e) => this.scrollToStation(e, station.stationcode));
         marker.bindPopup(`
         <b>${station.name}</b>
         <br/>
@@ -80,7 +82,11 @@ class VelybMap {
         <br/>
         Nombre de places libres : ${station.numdocksavailable}
         <br />
-        <button class="cta-popup" onclick="addFavorite(${station.stationcode}, '${station.name}')">Ajouter aux favoris</button>
+        ${
+          this.isFavoriteMap ? `<button class="cta-popup delete" onclick="removeFavorite(${station.stationcode}, '${station.name}')">Supprimer ce favori</button>` : 
+          this.userId ? `<button class="cta-popup add" onclick="addFavorite(${station.stationcode}, '${station.name}')">Ajouter aux favoris</button>` 
+          : `<button class="cta-popup unavailable" onclick="addFavorite(${station.stationcode}, '${station.name}')">Ajouter aux favoris</button>`
+        }
           `);
 
         mcg.addLayer(marker);
@@ -92,7 +98,23 @@ class VelybMap {
       console.error('Erreur de chargement des stations:', error);
     }
   }
+
+  scrollToStation(e, stationCode) {
+    if (!this.isListPage) return;
+
+    const stationCard = document.getElementById(stationCode);
+    const headerCard = document.getElementsByClassName('header-component')[0];
+    const sideBar = document.getElementById('sidebar-section')
+
+    stationCard.scrollIntoView(true);
+    sideBar.scrollBy({top: -(headerCard.getBoundingClientRect().height), behavior: "smooth"})
+
+    stationCard.classList.add('selected-station-card');
+    setTimeout(() => {
+      stationCard.classList.remove('selected-station-card');
+    }, 4000);
+  }
 }
 
-const velybMap = new VelybMap("http://localhost:8004/", userId ? userId : null, isFavoritePage);
+const velybMap = new VelybMap("http://localhost:8004/", userId ? userId : null, isFavoritePage, isListPage);
 velybMap.setStations();

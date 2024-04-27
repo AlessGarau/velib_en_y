@@ -10,7 +10,6 @@
       .station-infos {
         display: flex;
         flex-flow: column;
-        padding: 8px;
         gap: 8px;
   
         p {
