@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ title }} - Velyb</title>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"/>
     {% for css_path in css_paths %}
@@ -13,7 +12,7 @@
 <body>
     <main>
       {% if message and status %}
-      <p id="notification" {% if status %}class={{status}}{% endif %}>
+      <p class="notification" {% if status %}class={{status}}{% endif %}>
         {{message}}
       </p>
       {% endif %}
@@ -29,6 +28,6 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 {% for js_path in js_paths %}
-<script src={{ js_path }}></script>
+<script src={{ js_path }} type="module"></script>
 {% endfor %}
 </html>
