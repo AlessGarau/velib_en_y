@@ -157,7 +157,7 @@ def settings():
     return render_template('/layouts/settings.html', **metadata)
 
 
-@app.route('/favorites')
+@app.route('/favorites', methods=["GET", "POST"])
 def favorites():
     user = user_loaders.get_user_from_cookie()
 
@@ -172,11 +172,8 @@ def favorites():
         "station_type": "favorites"
     }
 
-    all_stations = requests.get("http://api-caching-server:8004")
-    all_stations = all_stations.json()["results"]
-
-    # list of favorite stations + the data relative to them from all_stations (coordinates, nom_arrondissement_communes & name)
-    metadata["favorite_stations"] = []
+    favorite_stations = requests.get(f"http://microservices_favorite:8002/api/favorites/{user['id']}")
+    metadata["favorite_stations"] = favorite_stations.json()["data"]
 
     return render_template('/layouts/favorites.html', **metadata)
 

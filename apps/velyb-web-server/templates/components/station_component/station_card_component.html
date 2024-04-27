@@ -1,12 +1,17 @@
-<div id="{{ station["stationcode"] }}" class="station-card">
+<div id="{{ station[" stationcode"] }}" class="station-card">
     <div class="station-infos">
         <h3>{{ station["name"] }}</h3>
         <p>{{ station["nom_arrondissement_communes"] }}</p>
     </div>
     {% if user %}
     <div class="actions">
-        <button onclick="addFavorite({{ station["stationcode"] }}, '{{ station["name"] }}')">
+        <button onclick="addFavorite({{ station["stationcode"] }}, '{{ station["name"] }}' )">
             <img src='ressources/img/fav_icon_empty.svg' />
+        </button>
+    </div>
+    <div class="actions">
+        <button onclick="removeFavorite({{ station["station_code"] }}, '{{ station["name"] }}' )">
+            <img src='ressources/img/fav_icon_full.svg' />
         </button>
     </div>
     {%endif%}
