@@ -12,7 +12,7 @@ async function addFavorite(station_code, name) {
             name_custom: name
         };
 
-        const res = await fetch('http://localhost:8002/api/favorites/', {
+        const res = await fetch('http://localhost:8000/bridge/favorites/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

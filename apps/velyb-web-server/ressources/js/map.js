@@ -49,7 +49,7 @@ class VelybMap {
       this.totalCount = rawData.totalCount;
 
       if (this.isFavoriteMap) {
-        const resFavs = await fetch(`http://localhost:8002/api/favorites/${this.userId}`);
+        const resFavs = await fetch(`http://localhost:8000/bridge/favorites/${this.userId}`);
         if (!resFavs.ok) {
           console.error("Erreur de chargement des données favorites.")
           return;  
@@ -92,5 +92,5 @@ class VelybMap {
   }
 }
 
-const velybMap = new VelybMap("http://localhost:8004/", userId ? userId : null, isFavoritePage);
+const velybMap = new VelybMap("http://localhost:8000/bridge/cache", userId ? userId : null, isFavoritePage);
 velybMap.setStations();
