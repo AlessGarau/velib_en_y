@@ -1,4 +1,4 @@
-<article class="station-card">
+<article id="{{ station["stationcode"] }}" class="station-card">
     {% if not user %}{# Logged in (and in favorite) #}
     <div class="station-infos">
         <h3>{{ station["name"] }}</h3>
