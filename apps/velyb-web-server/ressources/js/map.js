@@ -72,6 +72,8 @@ class VelybMap {
         const icon = this.isFavoriteMap ? favoriteStationIcon : stationIcon;
         const marker = L.marker(coordinates, {icon : icon});
         marker.bindPopup(`
+          <button onclick="addFavorite(${station.stationcode}, '${station.name}')">Ajouter aux favoris</button>
+          <br />
           <b>${station.name}</b>
           <br/>
           Nombre de vélos disponibles : ${station.numbikesavailable}
