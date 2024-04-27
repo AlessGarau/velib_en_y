@@ -206,10 +206,10 @@ def settings():
             message = data["message"]
 
             if response.ok:
-                res = make_response(redirect(f"/settings?m={message}&status=success"))
+                res = make_response(redirect(f"/settings?type=confidential&m={message}&status=success"))
                 return res
             else:
-                res = make_response(redirect(f"/settings?m={message}&status=error"))
+                res = make_response(redirect(f"/settings?type=confidential&m={message}&status=error"))
                 return res
 
 
