@@ -32,9 +32,9 @@ def favorite_station_exists(user_id: str, station_code: str, cursor: MySQLCursor
         WHERE user_id=%s AND station_code=%s
     """
     cursor.execute(select_query, (user_id, station_code,))
-    favorite_stations = cursor.fetchall()
+    favorite_station = cursor.fetchone()
 
-    return len(favorite_stations) > 0
+    return favorite_station
 
 
 def user_exists(user_id: int, cursor: MySQLCursor) -> bool:
@@ -103,8 +103,9 @@ def delete_favorite(station_code: str):
         if not (user_exists(user_id, cursor)):
             raise BaseException("Cet utilisateur n'existe pas.")
 
-        if not favorite_station_exists(user_id, station_code, cursor):
-            raise BaseException(f"La station {station_code} ne se trouve pas dans vos favoris.")
+        station = favorite_station_exists(user_id, station_code, cursor, True)
+        if station:
+            raise BaseException(f"La station {FavoriteStation(*station).name} ne se trouve dans vos favoris.")
 
         delete_query = """
             DELETE FROM favorite_station 
@@ -144,8 +145,9 @@ def update_favorite(station_code):
         if not user_exists(user_id, cursor):
             raise BaseException("Cet utilisateur n'existe pas.")
 
-        if not favorite_station_exists(user_id, station_code, cursor, True):
-            raise BaseException(f"La station {station_code} ne se trouve pas dans vos favoris.")
+        station = favorite_station_exists(user_id, station_code, cursor, True)
+        if station:
+            raise BaseException(f"La station {FavoriteStation(*station).name} ne se trouve dans vos favoris.")
 
         update_query = """
             UPDATE favorite_station
@@ -198,8 +200,9 @@ def create_favorite():
         if not all((station_code, user_id, name, picture, name_custom,)):
             raise BaseException("Veuillez remplir l'intégralité des champs.")
 
-        if favorite_station_exists(user_id, station_code, cursor, True):
-            raise BaseException(f"La station {station_code} se trouve déja dans vos favoris.")
+        station = favorite_station_exists(user_id, station_code, cursor, True)
+        if station:
+            raise BaseException(f"La station {FavoriteStation(*station).name} se trouve déja dans vos favoris.")
 
         insert_query = """INSERT INTO favorite_station VALUES(%s, %s, %s, %s, %s)"""
         cursor.execute(insert_query, (station_code, user_id, name, picture, name_custom,))

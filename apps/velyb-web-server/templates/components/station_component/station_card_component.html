@@ -5,9 +5,9 @@
     </div>
     {% if user %}
     <div class="actions">
-        <a href="javascript:addFavorite({{ station["stationcode"] }}, '{{ station["name"] }}')">
+        <button onclick="addFavorite({{ station["stationcode"] }}, '{{ station["name"] }}')">
             <img src='ressources/img/fav_icon_empty.svg' />
-        </a>
+        </button>
     </div>
     {%endif%}
 </div>
