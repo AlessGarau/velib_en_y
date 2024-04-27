@@ -8,7 +8,7 @@ async function addFavorite(station_code, name) {
             user_id: user_id,
             station_code: station_code,
             name: name,
-            picture: "x", // N'est même pas sur la maquette donc pas utilisé mais ok
+            picture: "NULL", // N'est même pas sur la maquette donc pas utilisé mais ok
             name_custom: name
         };
 
