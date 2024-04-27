@@ -116,14 +116,14 @@ def update_user():
                 cursor.close()
 
                 return jsonify({
-                    'data': None,
+                    'message': "Mot de passe modifié avec succès.",
                     'success': True
-                }), 204
+                }), 200
             case "profile":
                 firstname = body.get('firstname')
                 lastname = body.get('lastname')
                 profile_picture = body.get('profile_picture') if body.get('profile_picture') else ""
-                
+
                 if not all((firstname, lastname)):
                     raise BaseException("Veuillez remplir l'intégralité des champs.")
 

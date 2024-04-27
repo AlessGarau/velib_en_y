@@ -93,7 +93,7 @@ def login():
 @app.route('/register', methods=["GET", "POST"])
 def register():
     if request.method == "GET":
-        
+
         user = user_loaders.get_user_from_cookie()
 
         if user:
@@ -110,9 +110,9 @@ def register():
         }
 
         return render_template('/layouts/auth.html', **metadata)
-    
+
     elif request.method == "POST":
-        
+
         firstname = request.form.get("firstname")
         lastname = request.form.get("lastname")
         email = request.form.get("email")
@@ -132,10 +132,11 @@ def register():
             message = data.get("message")
             res = make_response(redirect(f"/login?m={message}&status=success"))
             return res
-        
+
         else:
             message = data.get("message")
             return redirect(f"/register?m={message}&status=error")
+
 
 @app.route('/settings', methods=['GET', 'POST'])
 def settings():
@@ -150,6 +151,8 @@ def settings():
         "user": user,
         "title": "Réglages",
         "key": "settings",
+        "message": request.args.get("m"),
+        "status": request.args.get("status"),
         "setting_type": setting_type_param
     }
 
@@ -163,12 +166,12 @@ def settings():
 
             headers = {'Content-Type': 'application/json'}
             response = requests.post('http://microservices_user:8003/api/users?type=profile',
-                                    json={
-                                        "firstname": firstname,
-                                        "lastname": lastname,
-                                        "user_id": str(user["id"])
-                                    },
-                                    headers=headers)
+                                     json={
+                                         "firstname": firstname,
+                                         "lastname": lastname,
+                                         "user_id": str(user["id"])
+                                     },
+                                     headers=headers)
             data = response.json()
 
             if response.ok:
@@ -180,35 +183,35 @@ def settings():
             else:
                 return render_template('/layouts/settings.html', **metadata)
 
-    
     elif setting_type_param == "confidential":
         if request.method == "GET":
             return render_template('/layouts/settings.html', **metadata)
-            
+
         elif request.method == "POST":
             old_password = request.form.get('old_password')
             new_password = request.form.get('new_password')
             new_password_repeated = request.form.get('new_password_repeated')
 
-
             headers = {'Content-Type': 'application/json'}
             response = requests.post('http://microservices_user:8003/api/users?type=password',
-                                    json={
-                                        "old_password": old_password,
-                                        "new_password": new_password,
-                                        "new_password_repeated": new_password_repeated,
-                                        "user_id": str(user["id"])
+                                     json={
+                                         "old_password": old_password,
+                                         "new_password": new_password,
+                                         "new_password_repeated": new_password_repeated,
+                                         "user_id": str(user["id"])
 
-                                    },
-                                    headers=headers)
+                                     },
+                                     headers=headers)
             data = response.json()
-            print(data)
+            message = data["message"]
 
             if response.ok:
-                return render_template('/layouts/settings.html', **metadata)
+                res = make_response(redirect(f"/settings?m={message}&status=success"))
+                return res
             else:
-                return render_template('/layouts/settings.html', **metadata)
-    
+                res = make_response(redirect(f"/settings?m={message}&status=error"))
+                return res
+
 
 @app.route('/favorites')
 def favorites():
@@ -237,7 +240,6 @@ def logout():
         res = make_response(redirect("/", code=302))
         res.delete_cookie('user')
         res.delete_cookie('user_id')
-        
 
         return res
     else:
