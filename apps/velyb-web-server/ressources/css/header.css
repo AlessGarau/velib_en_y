@@ -4,6 +4,9 @@
   flex-flow: column;
   gap: 12px;
   margin-bottom: 16px;
+  position: sticky;
+  top: 0;
+  background-color: var(--clr-white-primary);
 
   .user-card {
     padding: 16px 0;
