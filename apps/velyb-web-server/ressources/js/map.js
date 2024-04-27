@@ -1,7 +1,7 @@
 // TODO - Essayer de garder dernière position en localStorage
 
-const user_id = document.cookie.split("user_id=")[1];
-const is_favorite_page = window.location.pathname.includes("favorites");
+const userId = document.cookie.split("user_id=")[1];
+const isFavoritePage = window.location.pathname.includes("favorites");
 
 // Set initial view
 const map = L.map("map").setView([48.8566, 2.3522], 13);
@@ -11,39 +11,6 @@ L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
   className: "map-tiles",
 }).addTo(map);
 
-const favoritesResJson = `{
-  "data": [
-      {
-          "name": "Gabriel Lamé",
-          "name_custom": "Tah bogota lol hihi",
-          "picture": "wouh",
-          "station_code": "12031",
-          "user_id": 1
-      },
-      {
-          "name": "Bois de Vincennes.",
-          "name_custom": "bois",
-          "picture": "photo",
-          "station_code": "12041",
-          "user_id": 1
-      },
-      {
-          "name": "11 Novembre 1918 - 8 Mai 1945",
-          "name_custom": "date",
-          "picture": "wouh",
-          "station_code": "45003",
-          "user_id": 1
-      },
-      {
-          "name": " Saint-Séverin - Saint-Michel",
-          "name_custom": "saint",
-          "picture": "idk",
-          "station_code": "5033",
-          "user_id": 1
-      }
-  ],
-  "success": true
-}`;
 let stationIconSvg = '<svg width="20" height="24" viewBox="0 0 20 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
 '<path d="M19 10C19 17 10 23 10 23C10 23 1 17 1 10C1 7.61305 1.94821 5.32387 3.63604 3.63604C5.32387 1.94821 7.61305 1 10 1C12.3869 1 14.6761 1.94821 16.364 3.63604C18.0518 5.32387 19 7.61305 19 10Z" fill="#3574D3" fill-opacity="0.3"/>'+
 '<path d="M10 13C11.6569 13 13 11.6569 13 10C13 8.34315 11.6569 7 10 7C8.34315 7 7 8.34315 7 10C7 11.6569 8.34315 13 10 13Z" fill="#3574D3" fill-opacity="0.3"/>'+
@@ -75,39 +42,49 @@ popupAnchor: [0, -32]
 
 
 class VelybMap {
-  stations_per_commune = new Object();
-  favorite_stations = new Array();
-  total_count = 0;
+  favoriteStations = new Array();
+  totalCount = 0;
 
-  constructor(data_url, user_id = null, is_favorite_map) {
-    this.data_url = data_url;
-    this.user_id = user_id;
-    this.is_favorite_map = is_favorite_map
+  constructor(dataUrl, userId = null, isFavoriteMap) {
+    this.dataUrl = dataUrl;
+    this.userId = userId;
+    this.isFavoriteMap = isFavoriteMap;
   }
 
-  async set_stations() {
+  async setStations() {
     try {
-      const response = await fetch(this.data_url);
-      if (!response.ok) {
-        throw new Error('Network response not ok');
-      }
-      const data = await response.json();
-      this.total_count = data.total_count;
+      const res = await fetch(this.dataUrl);
+      if (!res.ok) {
+        console.error("Erreur de chargement des données OpenData.")
+        return;
+      } 
 
-      let favoriteDataStation = data.results
-      if (this.is_favorite_map){
-        const favoritesData = JSON.parse(favoritesResJson);
-        favoritesData.data.forEach(station => {
-        this.favorite_stations.push(station.station_code);
-      });
-      }
-      favoriteDataStation = favoriteDataStation.filter(station => this.favorite_stations.includes(station.stationcode))
-      const allDataStation = data.results;
-      const dataStation = is_favorite_page ? favoriteDataStation : allDataStation;
+      const rawData = await res.json();
+      let opendata = rawData.results;
+      this.totalCount = rawData.totalCount;
 
-      const markers = dataStation.map((station) => {
+      if (this.isFavoriteMap) {
+        const resFavs = await fetch(`http://localhost:8002/api/favorites/${this.userId}`);
+        if (!resFavs.ok) {
+          console.error("Erreur de chargement des données favorites.")
+          return;  
+        }
+        this.favoriteStations = (await resFavs.json()).data;
+        opendata = opendata.reduce((acc, curr) => {
+          const isFavorite = this.favoriteStations.find(favoriteStation => favoriteStation.station_code === curr.stationcode);
+          if (isFavorite) {
+            acc.push({
+              ...isFavorite,
+              ...curr
+            })
+          }
+          return acc;
+        }, [])
+      }
+
+      opendata.map((station) => {
         const coordinates = [station.coordonnees_geo.lat, station.coordonnees_geo.lon];
-        const icon = is_favorite_page ? favoriteStationIcon : stationIcon;
+        const icon = this.isFavoriteMap ? favoriteStationIcon : stationIcon;
         const marker = L.marker(coordinates, {icon : icon});
         marker.bindPopup(`
           <b>${station.name}</b>
@@ -119,21 +96,17 @@ class VelybMap {
           Nombre de places libres : ${station.numdocksavailable}
           `);
 
-        if (!this.stations_per_commune.hasOwnProperty(station.nom_arrondissement_communes)) {
-          this.stations_per_commune[station.nom_arrondissement_communes] = [];
-        }
-        this.stations_per_commune[station.nom_arrondissement_communes].push({ station: station, marker: marker });
-
         mcg.addLayer(marker);
         return marker;
       });
       mcg.addTo(map);
+      // debugger;
     } catch (error) {
-      console.error('Error setting stations:', error);
+      console.error('Erreur de chargement des stations:', error);
     }
   }
 }
 
-const velybMap = new VelybMap("http://localhost:8004/", user_id ? user_id : null, is_favorite_page);
-velybMap.set_stations();
+const velybMap = new VelybMap("http://localhost:8004/", userId ? userId : null, isFavoritePage);
+velybMap.setStations();
 
