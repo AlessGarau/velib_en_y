@@ -6,7 +6,6 @@ if (notificationElement) {
         notificationElement.classList.add('hide');
         notificationElement.remove()
     }, 3000);
-
 }
 
 /**

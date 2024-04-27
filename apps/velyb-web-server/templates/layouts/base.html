@@ -12,7 +12,7 @@
 <body>
     <main>
       {% if message and status %}
-      <p class="notification" {% if status %}class={{status}}{% endif %}>
+      <p id="notification" {% if status %}class={{status}}{% endif %}>
         {{message}}
       </p>
       {% endif %}
