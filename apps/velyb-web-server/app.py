@@ -9,7 +9,7 @@ app = Flask(__name__,
 app.secret_key = b"4072bd90fe380021dd09cb1dc213a782b315656cf0e920866118ea0c2a3bf933"
 
 base_metadata = {
-    'css_paths': ['ressources/css/style.css', 'ressources/css/header.css', 'ressources/css/tab.css', "ressources/css/map.css"],
+    'css_paths': ['ressources/css/style.css', 'ressources/css/header.css', 'ressources/css/tab.css', "ressources/css/map.css", "ressources/css/station.css"],
     'js_paths': ['/ressources/js/common.js', '/ressources/js/map.js', '/ressources/js/favorite.js'],
     'nav_items': {
         'unauthorized': [
@@ -95,7 +95,7 @@ def login():
 @app.route('/register', methods=["GET", "POST"])
 def register():
     if request.method == "GET":
-        
+
         user = user_loaders.get_user_from_cookie()
 
         if user:
@@ -112,9 +112,9 @@ def register():
         }
 
         return render_template('/layouts/auth.html', **metadata)
-    
+
     elif request.method == "POST":
-        
+
         firstname = request.form.get("firstname")
         lastname = request.form.get("lastname")
         email = request.form.get("email")
@@ -134,10 +134,11 @@ def register():
             message = data.get("message")
             res = make_response(redirect(f"/login?m={message}&status=success"))
             return res
-        
+
         else:
             message = data.get("message")
             return redirect(f"/register?m={message}&status=error")
+
 
 @app.route('/settings')
 def settings():
@@ -191,7 +192,6 @@ def logout():
         res = make_response(redirect("/", code=302))
         res.delete_cookie('user')
         res.delete_cookie('user_id')
-        
 
         return res
     else:

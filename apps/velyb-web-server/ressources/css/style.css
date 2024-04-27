@@ -41,6 +41,7 @@ main {
 
   #sidebar-section {
     min-width: 400px;
+    max-width: 400px;
     max-height: 100vh;
     margin: 16px;
     display: flex;
@@ -62,48 +63,6 @@ main {
   flex-flow: column;
   width: 100%;
   gap: 16px;
-}
-.station-container {
-  padding: 0 16px;
-
-  .station-card {
-    display: flex;
-    flex-flow: column;
-    gap: 10px;
-    padding: 16px 0;
-
-    .station-infos {
-      display: flex;
-      flex-flow: column;
-      padding: 8px;
-      gap: 8px;
-
-      p {
-        font-weight: var(--fw-medium);
-        font-size: var(--fs-small);
-        color: var(--clr-gray-secondary);
-      }
-    }
-
-    .actions {
-      display: flex;
-      flex-flow: row;
-      gap: 16px;
-      padding: 0 4px;
-
-      .favorite-icon {
-        width: 22px;
-        height: 22px;
-      }
-      .favorite-active {
-        fill: #FEDF89;
-    
-        path {
-          stroke: #FEDF89;
-        }
-      }
-    }
-  }
 }
 
 /* Utility */
