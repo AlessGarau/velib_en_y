@@ -10,8 +10,8 @@ app = Flask(__name__,
 app.secret_key = b"4072bd90fe380021dd09cb1dc213a782b315656cf0e920866118ea0c2a3bf933"
 
 base_metadata = {
-    'css_paths': ['ressources/css/style.css', 'ressources/css/header.css', 'ressources/css/tab.css', "ressources/css/map.css"],
-    'js_paths': ['/ressources/js/common.js', '/ressources/js/map.js'],
+    'css_paths': ['ressources/css/style.css', 'ressources/css/header.css', 'ressources/css/tab.css', "ressources/css/map.css", "ressources/css/station.css"],
+    'js_paths': ['/ressources/js/common.js', '/ressources/js/map.js', '/ressources/js/favorite.js'],
     'nav_items': {
         'unauthorized': [
             {'name': 'Accueil', 'link': '/', 'key': 'home'},
@@ -31,7 +31,6 @@ def index():
     user = user_loaders.get_user_from_cookie()
     metadata = {
         **base_metadata,
-
     }
 
     if user:
@@ -39,6 +38,9 @@ def index():
     metadata["title"] = "Accueil"
     metadata["key"] = "home"
     metadata["station_type"] = "all"
+
+    all_stations = requests.get("http://api-caching-server:8004")
+    metadata["all_stations"] = all_stations.json()["results"]
 
     return render_template('/layouts/index.html', **metadata)
 
@@ -170,6 +172,12 @@ def favorites():
         "station_type": "favorites"
     }
 
+    all_stations = requests.get("http://api-caching-server:8004")
+    all_stations = all_stations.json()["results"]
+
+    # list of favorite stations + the data relative to them from all_stations (coordinates, nom_arrondissement_communes & name)
+    metadata["favorite_stations"] = []
+
     return render_template('/layouts/favorites.html', **metadata)
 
 
@@ -182,7 +190,6 @@ def logout():
         res = make_response(redirect("/", code=302))
         res.delete_cookie('user')
         res.delete_cookie('user_id')
-        session.clear()
 
         return res
     else:

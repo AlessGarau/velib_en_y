@@ -1,0 +1,13 @@
+<div id="{{ station["stationcode"] }}" class="station-card">
+    <div class="station-infos">
+        <h3>{{ station["name"] }}</h3>
+        <p>{{ station["nom_arrondissement_communes"] }}</p>
+    </div>
+    {% if user %}
+    <div class="actions">
+        <a href="javascript:addFavorite({{ station["stationcode"] }}, '{{ station["name"] }}')">
+            <img src='ressources/img/fav_icon_empty.svg' />
+        </a>
+    </div>
+    {%endif%}
+</div>
