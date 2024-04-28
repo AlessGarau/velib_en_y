@@ -1,4 +1,4 @@
-import { addFavorite } from "./favorite.js";
+import { addFavorite, removeFavorite } from "./favorite.js";
 
 class Stations {
     stationContainer = document.getElementsByClassName('station-container')[0]
@@ -90,9 +90,9 @@ class Stations {
             actions.appendChild(favoriteButton);
 
             if(areInFavorite){
-                console.log('ici')
+                // edit button
                 const editButton = document.createElement('button');
-                editButton.addEventListener('click', () => (console.log('coucou')));
+                editButton.addEventListener('click', () => {this.toggleEditForm(data.station_code)});
                 editButton.classList.add('edit-cta');
                 const editIcon = document.createElement('img');
                 editIcon.src = 'ressources/img/edit_icon.svg';
@@ -102,6 +102,50 @@ class Stations {
 
             // Add actions container to station card
             stationCard.appendChild(actions);
+
+            if(areInFavorite){
+                // form
+                const editForm = document.createElement('form');
+                editForm.method='POST';
+                editForm.id = 'form-' + data.station_code;
+                editForm.classList.add('none');
+
+                // div Element
+                const divElement = document.createElement('div');
+
+                // label
+                const labelName = document.createElement('label');
+                labelName.textContent = "Nom du favori";
+                labelName.setAttribute('for', 'name_custom');
+
+                // input
+                const inputName = document.createElement('input');
+                inputName.type = 'text';
+                inputName.id = 'name_custom';
+                inputName.name = 'name_custom';
+                inputName.placeholder = data.name;
+                inputName.value = data.name_custom;
+
+                divElement.appendChild(labelName);
+                divElement.appendChild(inputName);
+
+                // hide input
+                const inputStationCode = document.createElement('input');
+                inputStationCode.type = 'hidden';
+                inputStationCode.id = 'station_code';
+                inputStationCode.name = 'station_code';
+                inputStationCode.value = data.station_code;
+
+                // button
+                const submitButton = document.createElement('button');
+                submitButton.type = 'submit';
+                submitButton.textContent = 'Enregistrer le changement';
+
+                editForm.appendChild(divElement);
+                editForm.appendChild(inputStationCode);
+                editForm.appendChild(submitButton);
+                stationCard.appendChild(editForm);
+            }
         }
 
         return stationCard;
@@ -112,6 +156,15 @@ class Stations {
         divider.classList.add('divider');
 
         return divider;
+    }
+
+    toggleEditForm(stationCode){
+        const editForm = document.getElementById('form-' + stationCode);
+        if(editForm.classList.contains('none')){
+            editForm.classList.remove('none');
+        } else {
+            editForm.classList.add('none');
+        }
     }
 
 }

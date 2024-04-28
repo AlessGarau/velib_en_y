@@ -40,23 +40,49 @@ def index():
 
     return render_template('/layouts/index.html', **metadata)
 
-@app.route('/favorites', methods=["GET", "POST", "DELETE"])
+@app.route('/favorites', methods=["GET", "POST"])
 def favorites():
     user = user_loaders.get_user_from_cookie()
 
     if not user:
         return redirect('/')
 
-    metadata = {
-        **base_metadata,
-        "title": "Favorws",
-        "key": "favorites",
-        "station_type": "favorites",
-        "user": user,
-        "js_paths": [*base_metadata["js_paths"], "/ressources/js/station.js"]
-    }
 
-    return render_template('/layouts/favorites.html', **metadata)
+    if request.method == "GET":
+        metadata = {
+            **base_metadata,
+            "title": "Favorws",
+            "key": "favorites",
+            "station_type": "favorites",
+            "user": user,
+            "message": request.args.get("m"),
+            "status": request.args.get("status"),
+            "js_paths": [*base_metadata["js_paths"], "/ressources/js/station.js"],
+            "css_paths": [*base_metadata["css_paths"], "/ressources/css/form.css"]
+        }
+
+        return render_template('/layouts/favorites.html', **metadata)
+    elif request.method == "POST":
+        station_code = request.form.get('station_code')
+        name_custom = request.form.get('name_custom')
+        headers = {'Content-Type': 'application/json'}
+        response = requests.put(f'http://microservices_favorite:8002/api/favorites/{station_code}',
+                                 json={
+                                     "user_id": request.cookies.get('user_id'),
+                                     "name_custom": name_custom
+                                 },
+                                 headers=headers)
+        data = response.json()
+
+        if response.ok:
+            message = 'Modification enregistrée avec succès !'
+            res = make_response(redirect(f"/favorites?m={message}&status=success"))
+            return res
+        else:
+            message = data.get("message")
+            return redirect(f"/favorites?m={message}&status=error")
+
+
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
