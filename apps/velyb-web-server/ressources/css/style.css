@@ -120,6 +120,10 @@ h3 {
   opacity: 0;
 }
 
+.none{
+  display: none;
+}
+
 @keyframes notificationFade {
   0% {
     opacity: 1;

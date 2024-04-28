@@ -10,8 +10,6 @@ from database_access_layer.models.favorite_station import FavoriteStation
 load_dotenv()
 
 app = Flask(__name__)
-
-
 def favorite_station_exists(user_id: str, station_code: str, cursor: MySQLCursor, check_user: bool = False) -> bool:
     """
     Checks that the favorite station targeted (user_id and station_code) exists in the db
@@ -107,8 +105,8 @@ def delete_favorite(station_code: str):
             raise BaseException("Veuillez vous connecter pour ajouter des stations favorites.")
 
         station = favorite_station_exists(user_id, station_code, cursor, True)
-        if station:
-            raise BaseException(f"La station {FavoriteStation(*station).name} ne se trouve dans vos favoris.")
+        if not station:
+            raise BaseException(f"Cette station ne se trouve pas dans vos favoris.")
 
         delete_query = """
             DELETE FROM favorite_station 
@@ -121,7 +119,7 @@ def delete_favorite(station_code: str):
         return jsonify({
             'data': None,
             'success': True
-        }), 204
+        }), 200
     except BaseException as e:
         return jsonify({
             'message': str(e),
@@ -149,8 +147,8 @@ def update_favorite(station_code):
             raise BaseException("Veuillez vous connecter pour ajouter des stations favorites.")
 
         station = favorite_station_exists(user_id, station_code, cursor, True)
-        if station:
-            raise BaseException(f"La station {FavoriteStation(*station).name} ne se trouve dans vos favoris.")
+        if not station:
+            raise BaseException(f"La station ne se trouve pas dans vos favoris.")
 
         update_query = """
             UPDATE favorite_station
@@ -238,6 +236,7 @@ def after_request(response):
     header = response.headers
     header['Access-Control-Allow-Origin'] = 'http://localhost:8000'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+    response.headers["Access-Control-Allow-Methods"] = '*'
 
     return response
 
