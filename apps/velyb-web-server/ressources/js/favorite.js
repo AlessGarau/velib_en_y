@@ -2,7 +2,7 @@ import { createNotification } from "./common.js";
 
 const user_id = document.cookie.split("user_id=")[1];
 
-async function addFavorite(station_code, name) {
+export async function addFavorite(station_code, name) {
     try {
         const favoriteCredentials = {
             user_id: user_id,
