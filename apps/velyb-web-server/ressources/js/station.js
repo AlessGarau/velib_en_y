@@ -10,17 +10,15 @@ class Stations {
 
     /**
      * Génération des stationCards optimisées
-     * @param {Object} opendata Données opendata
-     * @param {Array} opendata.results Liste des stations
-     * @param {Number} opendata.total_count Nombre total de stations listée s
+     * @param {Array} opendata Liste des stations
      */
     async setStationList(opendata) {
         let i = 0;
         const batchSize = 25;
 
         const processBatch = async () => {
-            while (i < opendata.total_count) {
-                const batch = opendata.results.slice(i, i + batchSize);
+            while (i < opendata.length) {
+                const batch = opendata.slice(i, i + batchSize);
                 await Promise.all(batch.map(async (station) => {
                     const stationCard = this.generateStationCard(station);
                     const divider = this.generateDivider()

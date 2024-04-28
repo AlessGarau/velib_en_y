@@ -29,7 +29,8 @@ popupAnchor: [0, -32]
 
 class VelybMap {
   favoriteStations = new Array();
-  opendataRaw = [];
+  opendataRaw = {};
+  opendataParsed = []
   isFavoriteMap = window.location.pathname.includes("favorites");
   isListPage = this.isFavoriteMap || window.location.pathname === "/"
 
@@ -47,7 +48,7 @@ class VelybMap {
       } 
 
       this.opendataRaw = await res.json();
-      let opendata = [...this.opendataRaw.results];
+      this.opendataParsed = [...this.opendataRaw.results];
 
       if (this.isFavoriteMap) {
         const resFavs = await fetch(`http://localhost:8000/bridge/favorites/${this.userId}`);
@@ -56,7 +57,7 @@ class VelybMap {
           return;  
         }
         this.favoriteStations = (await resFavs.json()).data;
-        opendata = opendata.reduce((acc, curr) => {
+        this.opendataParsed = this.opendataParsed.reduce((acc, curr) => {
           const isFavorite = this.favoriteStations.find(favoriteStation => favoriteStation.station_code === curr.stationcode);
           if (isFavorite) {
             acc.push({
@@ -68,7 +69,7 @@ class VelybMap {
         }, [])
       }
 
-      await opendata.map((station) => {
+      await this.opendataParsed.map((station) => {
         const coordinates = [station.coordonnees_geo.lat, station.coordonnees_geo.lon];
         const icon = this.isFavoriteMap ? favoriteStationIcon : stationIcon;
         const marker = L.marker(coordinates, {icon : icon}).on('click', (e) => this.scrollToStation(e, station.stationcode));
@@ -118,4 +119,4 @@ class VelybMap {
 export const velybMap = new VelybMap("http://localhost:8000/bridge/cache/", userId ? userId : null);
 
 await velybMap.setStations();
-if (velybMap.isListPage) await stations.setStationList(velybMap.opendataRaw);
+if (velybMap.isListPage) await stations.setStationList(velybMap.opendataParsed);
