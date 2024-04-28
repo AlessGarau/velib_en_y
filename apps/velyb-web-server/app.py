@@ -43,13 +43,13 @@ def index():
 
     return render_template('/layouts/index.html', **metadata)
 
+
 @app.route('/favorites', methods=["GET", "POST"])
 def favorites():
     user = user_loaders.get_user_from_cookie()
 
     if not user:
         return redirect('/')
-
 
     if request.method == "GET":
         metadata = {
@@ -70,11 +70,11 @@ def favorites():
         name_custom = request.form.get('name_custom')
         headers = {'Content-Type': 'application/json'}
         response = requests.put(f'http://microservices_favorite:8002/api/favorites/{station_code}',
-                                 json={
-                                     "user_id": request.cookies.get('user_id'),
-                                     "name_custom": name_custom
-                                 },
-                                 headers=headers)
+                                json={
+                                    "user_id": request.cookies.get('user_id'),
+                                    "name_custom": name_custom
+                                },
+                                headers=headers)
         data = response.json()
 
         if response.ok:
@@ -84,7 +84,6 @@ def favorites():
         else:
             message = data.get("message")
             return redirect(f"/favorites?m={message}&status=error")
-
 
 
 @app.route('/login', methods=["GET", "POST"])
@@ -261,6 +260,7 @@ def settings():
 
             else:
                 return redirect("/?m=Erreur 404, cette page n'existe pas.&status=error")
+
 
 @app.route('/logout')
 def logout():

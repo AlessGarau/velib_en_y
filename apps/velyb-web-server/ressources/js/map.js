@@ -49,24 +49,26 @@ class VelybMap {
 
       this.opendataRaw = await res.json();
       this.opendataParsed = [...this.opendataRaw.results];
-
-      const resFavs = await fetch(`http://localhost:8000/bridge/favorites/${this.userId}`);
-      if (!resFavs.ok) {
-        console.error("Erreur de chargement des données favorites.")
-        return;  
-      }
-      this.favoriteStations = (await resFavs.json()).data;
-      if (this.isFavoriteMap) {
-        this.opendataParsed = this.opendataParsed.reduce((acc, curr) => {
-          const isFavorite = this.favoriteStations.find(favoriteStation => favoriteStation.station_code === curr.stationcode);
-          if (isFavorite) {
-            acc.push({
-              ...isFavorite,
-              ...curr
-            })
-          }
-          return acc;
-        }, [])
+      
+      if (this.userId) {
+        const resFavs = await fetch(`http://localhost:8000/bridge/favorites/${this.userId}`);
+        if (!resFavs.ok) {
+          console.error("Erreur de chargement des données favorites.")
+          return;  
+        }
+        this.favoriteStations = (await resFavs.json()).data;
+        if (this.isFavoriteMap) {
+          this.opendataParsed = this.opendataParsed.reduce((acc, curr) => {
+            const isFavorite = this.favoriteStations.find(favoriteStation => favoriteStation.station_code === curr.stationcode);
+            if (isFavorite) {
+              acc.push({
+                ...isFavorite,
+                ...curr
+              })
+            }
+            return acc;
+          }, [])
+        }
       }
 
       await this.opendataParsed.map((station) => {

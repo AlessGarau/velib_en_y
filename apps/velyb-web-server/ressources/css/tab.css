@@ -19,4 +19,9 @@
             color: var(--clr-white-primary);
         }
     }
+
+    &.position-invite {
+        top: 196px;
+    }
+    
 }

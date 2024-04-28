@@ -1,3 +1,5 @@
+const userId = document.cookie.split("user_id=")[1];
+
 // Notification should disappear after 3 seconds
 const notificationElement = document.getElementById('notification');
 
@@ -26,4 +28,9 @@ export const createNotification = (message, type) => {
         element.remove()
     }, 3000);
 
+}
+console.log("bah ok")
+if (!userId) {
+    const tabNavigation = document.querySelector('.tab-nav');
+    tabNavigation.classList.add('position-invite')
 }
