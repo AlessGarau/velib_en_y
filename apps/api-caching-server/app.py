@@ -3,9 +3,9 @@ import requests
 import os
 
 from cache_protocol_models.cache_protocol import CacheProtocol
+from dotenv import load_dotenv
 
-# ADDRESS_HOST = '0.0.0.0'
-# PORT_DEFAULT = 8004
+load_dotenv()
 ADDRESS_HOST = os.getenv('TCP_HOST')
 PORT_DEFAULT = int(os.getenv('TCP_PORT'))
 
