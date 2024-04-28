@@ -47,7 +47,7 @@ class Stations {
 
         // station name
         const stationName = document.createElement('h3');
-        stationName.textContent = data.name;
+        stationName.textContent = areInFavorite ? data.name_custom : data.name;
         stationInfos.appendChild(stationName);
 
         // station commune
@@ -89,12 +89,19 @@ class Stations {
             // Add favorite button to actions container
             actions.appendChild(favoriteButton);
 
-            // Add actions container to station card
-            stationCard.appendChild(actions);
-
             if(areInFavorite){
                 console.log('ici')
+                const editButton = document.createElement('button');
+                editButton.addEventListener('click', () => (console.log('coucou')));
+                editButton.classList.add('edit-cta');
+                const editIcon = document.createElement('img');
+                editIcon.src = 'ressources/img/edit_icon.svg';
+                editButton.appendChild(editIcon);
+                actions.appendChild(editButton);
             }
+
+            // Add actions container to station card
+            stationCard.appendChild(actions);
         }
 
         return stationCard;
