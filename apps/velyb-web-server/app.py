@@ -31,16 +31,12 @@ def index():
     user = user_loaders.get_user_from_cookie()
     metadata = {
         **base_metadata,
+        "title": "Accueil",
+        "key": "home",
+        "station_type": "all",
+        "user": user if user else None,
+        "js_paths": [*base_metadata["js_paths"], "/ressources/js/station.js"]
     }
-
-    if user:
-        metadata["user"] = user
-    metadata["title"] = "Accueil"
-    metadata["key"] = "home"
-    metadata["station_type"] = "all"
-
-    all_stations = requests.get("http://api-caching-server:8004")
-    metadata["all_stations"] = all_stations.json()["results"]
 
     return render_template('/layouts/index.html', **metadata)
 
