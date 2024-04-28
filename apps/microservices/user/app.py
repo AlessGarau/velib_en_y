@@ -66,7 +66,7 @@ def user_profile():
         close_connection(cnx)
 
 
-@app.route("/api/users", methods=['PUT'])
+@app.route("/api/users", methods=['POST'])
 def update_user():
     cnx = connect_to_database()
 
@@ -116,9 +116,9 @@ def update_user():
                 cursor.close()
 
                 return jsonify({
-                    'data': None,
+                    'message': "Mot de passe modifié avec succès.",
                     'success': True
-                }), 204
+                }), 200
             case "profile":
                 firstname = body.get('firstname')
                 lastname = body.get('lastname')

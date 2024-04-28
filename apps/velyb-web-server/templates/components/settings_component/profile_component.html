@@ -1,1 +1,12 @@
-Composant profile.html
+<form method="POST">
+  <div>
+    <label for="firstname">Prénom</label>
+    <input type="firstname" id="firstname" name="firstname" placeholder="Entrez votre prénom"
+    value={{user["firstname"]}} />
+  </div>
+  <div>
+    <label for="lastname">Nom</label>
+    <input type="lastname" id="lastname" name="lastname" value={{user["lastname"]}} placeholder="Entrez votre nom"/>
+  </div>
+  <button type="submit">Enregistrer les changements</button>
+</form>

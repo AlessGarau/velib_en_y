@@ -134,7 +134,7 @@ def register():
             return redirect(f"/register?m={message}&status=error")
 
 
-@app.route('/settings')
+@app.route('/settings', methods=["POST", "GET"])
 def settings():
     user = user_loaders.get_user_from_cookie()
     setting_type_param = request.args.get("type")
@@ -147,10 +147,74 @@ def settings():
         "user": user,
         "title": "Réglages",
         "key": "settings",
-        "setting_type": setting_type_param
+        "message": request.args.get("m"),
+        "status": request.args.get("status"),
+        "setting_type": setting_type_param,
+        "css_paths": [*base_metadata["css_paths"], "ressources/css/settings.css"]
     }
 
-    return render_template('/layouts/settings.html', **metadata)
+    if request.method == "GET":
+        if setting_type_param == "profile":
+            return render_template('/layouts/settings.html', **metadata)
+
+        if setting_type_param == "confidential":
+            return render_template('/layouts/settings.html', **metadata)
+
+    if request.method == "POST":
+        if setting_type_param == "profile":
+            firstname = request.form.get('firstname')
+            lastname = request.form.get('lastname')
+
+            headers = {'Content-Type': 'application/json'}
+            response = requests.post('http://microservices_user:8003/api/users?type=profile',
+                                     json={
+                                         "firstname": firstname,
+                                         "lastname": lastname,
+                                         "user_id": str(user["id"])
+                                     },
+                                     headers=headers)
+            data = response.json()
+
+            if response.ok:
+                metadata["user"] = data.get("data")
+                res = make_response(redirect(f"/settings?type=profile"))
+                res.delete_cookie('user')
+                res.set_cookie('user', json.dumps(metadata["user"]))
+                return res
+            else:
+                return render_template('/layouts/settings.html', **metadata)
+
+        elif setting_type_param == "confidential":
+            if request.method == "GET":
+                return render_template('/layouts/settings.html', **metadata)
+
+            elif request.method == "POST":
+                old_password = request.form.get('old_password')
+                new_password = request.form.get('new_password')
+                new_password_repeated = request.form.get('new_password_repeated')
+
+                headers = {'Content-Type': 'application/json'}
+                response = requests.post('http://microservices_user:8003/api/users?type=password',
+                                         json={
+                                             "old_password": old_password,
+                                             "new_password": new_password,
+                                             "new_password_repeated": new_password_repeated,
+                                             "user_id": str(user["id"])
+
+                                         },
+                                         headers=headers)
+                data = response.json()
+                message = data["message"]
+
+                if response.ok:
+                    res = make_response(redirect(f"/m={message}&status=success"))
+                    return res
+                else:
+                    res = make_response(redirect(f"/settings?type=confidential&m={message}&status=error"))
+                    return res
+
+            else:
+                return redirect("/?m=Erreur 404, cette page n'existe pas.&status=error")
 
 
 @app.route('/favorites')
