@@ -29,7 +29,7 @@ export const createNotification = (message, type) => {
     }, 3000);
 
 }
-console.log("bah ok")
+
 if (!userId) {
     const tabNavigation = document.querySelector('.tab-nav');
     tabNavigation.classList.add('position-invite')

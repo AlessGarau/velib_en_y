@@ -224,7 +224,7 @@ def settings():
 
             if response.ok:
                 metadata["user"] = data.get("data")
-                res = make_response(redirect(f"/settings?type=profile"))
+                res = make_response(redirect(f"/settings?type=profile&m=Profil modifié avec succès&status=success"))
                 res.delete_cookie('user')
                 res.set_cookie('user', json.dumps(metadata["user"]))
                 return res
@@ -254,7 +254,7 @@ def settings():
                 message = data["message"]
 
                 if response.ok:
-                    res = make_response(redirect(f"/?m={message}&status=success"))
+                    res = make_response(redirect(f"/settings?type=confidential&m={message}&status=success"))
                     return res
                 else:
                     res = make_response(redirect(f"/settings?type=confidential&m={message}&status=error"))
@@ -307,6 +307,11 @@ def remove_favorite_bridge(station_code):
 @app.get('/bridge/cache/')
 def get_cache_bridge():
     return station_loaders.get_stations()
+
+
+@app.errorhandler(404)
+def page_not_found(error):
+    return redirect("/?m=Erreur 404, cette page n'existe pas.&status=error")
 
 
 if __name__ == '__main__':
