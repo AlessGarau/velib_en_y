@@ -1,10 +1,13 @@
 import json
 
+from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 from mysql.connector.cursor import MySQLCursor
 
 from database_access_layer.database import connect_to_database, close_connection
 from database_access_layer.models.favorite_station import FavoriteStation
+
+load_dotenv()
 
 app = Flask(__name__)
 def favorite_station_exists(user_id: str, station_code: str, cursor: MySQLCursor, check_user: bool = False) -> bool:

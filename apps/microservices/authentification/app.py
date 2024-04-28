@@ -2,6 +2,7 @@ import re
 import hashlib
 import json
 
+from dotenv import load_dotenv
 from flask import Flask, request, jsonify, session, make_response
 from markupsafe import escape
 from mysql.connector.cursor import MySQLCursor
@@ -9,6 +10,7 @@ from mysql.connector.cursor import MySQLCursor
 from database_access_layer.database import connect_to_database, close_connection
 from database_access_layer.models.user import User
 
+load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = b"4072bd90fe380021dd09cb1dc213a782b315656cf0e920866118ea0c2a3bf933"

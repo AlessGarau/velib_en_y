@@ -1,9 +1,12 @@
+from loaders import user_loaders, favorite_loaders, station_loaders
+from flask import Flask, make_response, redirect, render_template, request, session
 import json
 import requests
 import requests.cookies
 
-from flask import Flask, make_response, redirect, render_template, request, session
-from loaders import user_loaders, favorite_loaders, station_loaders
+from dotenv import load_dotenv
+load_dotenv()
+
 
 app = Flask(__name__,
             static_folder='ressources/',)

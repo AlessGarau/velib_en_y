@@ -24,7 +24,7 @@ clean_up() {
 trap "clean_up" EXIT SIGINT SIGTERM INT
 
 create_and_activate_venv() {
-	$PYTHON -m venv velyb
+	$PYTHON -m venv velyb_env
 	source velyb/bin/activate
 }
 

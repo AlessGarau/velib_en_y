@@ -1,11 +1,14 @@
 import json
 import hashlib
 
+from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 from mysql.connector.cursor import MySQLCursor
 
 from database_access_layer.database import close_connection, connect_to_database
 from database_access_layer.models.user import User
+
+load_dotenv()
 
 app = Flask(__name__)
 cnx = connect_to_database()
