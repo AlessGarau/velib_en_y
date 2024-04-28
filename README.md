@@ -33,6 +33,8 @@ docker compose up
 # Importer la base de donnée, via votre site admin ou le CLI
 mysql -u root -p velyb < script.sql
 
+# Mettre en place les .env dans toutes les apps
+
 # Prépation des dossiers et lancement des processus
 source ./setup.sh all
 ```
