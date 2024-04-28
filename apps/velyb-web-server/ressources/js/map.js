@@ -119,4 +119,4 @@ class VelybMap {
 export const velybMap = new VelybMap("http://localhost:8000/bridge/cache/", userId ? userId : null);
 
 await velybMap.setStations();
-if (velybMap.isListPage) await stations.setStationList(velybMap.opendataParsed, velybMap.favoriteStations);
+if (velybMap.isListPage) await stations.setStationList(velybMap.opendataParsed, velybMap.favoriteStations, velybMap.isFavoriteMap);

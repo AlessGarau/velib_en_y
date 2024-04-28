@@ -12,7 +12,7 @@ class Stations {
      * Génération des stationCards optimisées
      * @param {Array} opendata Liste des stations
      */
-    async setStationList(opendata, favoriteStations) {
+    async setStationList(opendata, favoriteStations, areInFavorite) {
         let i = 0;
         const batchSize = 25;
 
@@ -20,7 +20,7 @@ class Stations {
             while (i < opendata.length) {
                 const batch = opendata.slice(i, i + batchSize);
                 await Promise.all(batch.map(async (station) => {
-                    const stationCard = this.generateStationCard(station, favoriteStations.find(favoriteStation => favoriteStation.station_code === station.stationcode));
+                    const stationCard = this.generateStationCard(station, favoriteStations.find(favoriteStation => favoriteStation.station_code === station.stationcode), areInFavorite);
                     const divider = this.generateDivider()
                     this.stationContainer.appendChild(stationCard);
                     this.stationContainer.appendChild(divider);
@@ -35,7 +35,7 @@ class Stations {
         await processBatch();
     }
 
-    generateStationCard(data, isFavorite) {
+    generateStationCard(data, isFavoriteStation, areInFavorite) {
         // main station card container
         const stationCard = document.createElement('div');
         stationCard.id = data.stationcode;
@@ -69,7 +69,7 @@ class Stations {
             const favoriteIcon = document.createElement('img');
 
             // debugger
-            if(isFavorite){
+            if(isFavoriteStation){
                 // favorite button
                 favoriteButton.addEventListener('click', () => removeFavorite(data.stationcode, data.name));
 
@@ -91,6 +91,10 @@ class Stations {
 
             // Add actions container to station card
             stationCard.appendChild(actions);
+
+            if(areInFavorite){
+                console.log('ici')
+            }
         }
 
         return stationCard;
