@@ -60,7 +60,7 @@ def user_favorites(user_id):
         cursor = cnx.cursor(buffered=True)
 
         if not user_exists(user_id, cursor):
-            raise BaseException("Cet utilisateur n'existe pas.")
+            raise BaseException("Veuillez vous connecter pour ajouter des stations favorites.")
 
         select_query = """
             SELECT *
@@ -101,7 +101,7 @@ def delete_favorite(station_code: str):
         cursor = cnx.cursor(buffered=True)
 
         if not (user_exists(user_id, cursor)):
-            raise BaseException("Cet utilisateur n'existe pas.")
+            raise BaseException("Veuillez vous connecter pour ajouter des stations favorites.")
 
         station = favorite_station_exists(user_id, station_code, cursor, True)
         if station:
@@ -143,7 +143,7 @@ def update_favorite(station_code):
             raise BaseException("Veuillez remplir l'intégralité des champs.")
 
         if not user_exists(user_id, cursor):
-            raise BaseException("Cet utilisateur n'existe pas.")
+            raise BaseException("Veuillez vous connecter pour ajouter des stations favorites.")
 
         station = favorite_station_exists(user_id, station_code, cursor, True)
         if station:
@@ -195,7 +195,7 @@ def create_favorite():
         cursor = cnx.cursor(buffered=True)
 
         if not (user_exists(user_id, cursor)):
-            raise BaseException("Cet utilisateur n'existe pas.")
+            raise BaseException("Veuillez vous connecter pour ajouter des stations favorites.")
 
         if not all((station_code, user_id, name, picture, name_custom,)):
             raise BaseException("Veuillez remplir l'intégralité des champs.")
