@@ -5,7 +5,7 @@
     </div>
     {% if user %}
     <div class="actions">
-        <button onclick="addFavorite({{ station["stationcode"] }}, '{{ station["name"] }}' )">
+        <button onclick="addFavorite({{ station["stationcode"] }}, `{{ station["name"] | safe }}`)">
             <img src='ressources/img/fav_icon_empty.svg' />
         </button>
     </div>

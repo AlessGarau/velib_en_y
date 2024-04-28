@@ -3,7 +3,7 @@ import requests
 import requests.cookies
 
 from flask import Flask, make_response, redirect, render_template, request, session
-from loaders import user_loaders
+from loaders import user_loaders, favorite_loaders, station_loaders
 
 app = Flask(__name__,
             static_folder='ressources/',)
@@ -31,16 +31,12 @@ def index():
     user = user_loaders.get_user_from_cookie()
     metadata = {
         **base_metadata,
+        "title": "Accueil",
+        "key": "home",
+        "station_type": "all",
+        "user": user if user else None,
+        "js_paths": [*base_metadata["js_paths"], "/ressources/js/station.js"]
     }
-
-    if user:
-        metadata["user"] = user
-    metadata["title"] = "Accueil"
-    metadata["key"] = "home"
-    metadata["station_type"] = "all"
-
-    all_stations = requests.get("http://api-caching-server:8004")
-    metadata["all_stations"] = all_stations.json()["results"]
 
     return render_template('/layouts/index.html', **metadata)
 
@@ -199,6 +195,28 @@ def logout():
 @app.route('/error/<code>')
 def error(code=404):
     return render_template(f"/layouts/{code}.html")
+
+
+@app.get('/bridge/favorites/<user_id>')
+def get_favorites_bridge(user_id):
+    return favorite_loaders.get_favorites(user_id)
+
+
+@app.post('/bridge/favorites/')
+def create_favorite_bridge():
+    body = request.get_json()
+    return favorite_loaders.create_favorite(body)
+
+
+@app.delete('/bridge/favorites/<station_code>')
+def remove_favorite_bridge(station_code):
+    body = request.get_json()
+    return favorite_loaders.remove_favorite(body, station_code)
+
+
+@app.get('/bridge/cache/')
+def get_cache_bridge():
+    return station_loaders.get_stations()
 
 
 if __name__ == '__main__':

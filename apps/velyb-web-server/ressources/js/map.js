@@ -1,10 +1,12 @@
 // TODO - Essayer de garder dernière position en localStorage
 
+import { stations } from "./station.js";
+
 const userId = document.cookie.split("user_id=")[1];
 const isFavoritePage = window.location.pathname.includes("favorites");
 
 // Set initial view
-const map = L.map("map").setView([48.8566, 2.3522], 13);
+const map = L.map("map").setView([48.8566, 2.3522], 11);
 const mcg = L.markerClusterGroup();
 L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -29,6 +31,7 @@ popupAnchor: [0, -32]
 class VelybMap {
   favoriteStations = new Array();
   totalCount = 0;
+  opendataRaw = [];
 
   constructor(dataUrl, userId = null, isFavoriteMap) {
     this.dataUrl = dataUrl;
@@ -45,11 +48,12 @@ class VelybMap {
       } 
 
       const rawData = await res.json();
-      let opendata = rawData.results;
+      this.opendataRaw = rawData.results;
+      let opendata = [...this.opendataRaw];
       this.totalCount = rawData.totalCount;
 
       if (this.isFavoriteMap) {
-        const resFavs = await fetch(`http://localhost:8002/api/favorites/${this.userId}`);
+        const resFavs = await fetch(`http://localhost:8000/bridge/favorites/${this.userId}`);
         if (!resFavs.ok) {
           console.error("Erreur de chargement des données favorites.")
           return;  
@@ -67,7 +71,7 @@ class VelybMap {
         }, [])
       }
 
-      opendata.map((station) => {
+      await opendata.map((station) => {
         const coordinates = [station.coordonnees_geo.lat, station.coordonnees_geo.lon];
         const icon = this.isFavoriteMap ? favoriteStationIcon : stationIcon;
         const marker = L.marker(coordinates, {icon : icon});
@@ -92,5 +96,8 @@ class VelybMap {
   }
 }
 
-const velybMap = new VelybMap("http://localhost:8004/", userId ? userId : null, isFavoritePage);
-velybMap.setStations();
+const isHome = window.location.pathname == "/";
+export const velybMap = new VelybMap("http://localhost:8000/bridge/cache/", userId ? userId : null, isFavoritePage);
+
+await velybMap.setStations();
+if (isHome) await stations.setStationList(velybMap.opendataRaw);
