@@ -37,6 +37,8 @@ def index():
         "title": "Accueil",
         "key": "home",
         "station_type": "all",
+        "message": request.args.get("m"),
+        "status": request.args.get("status"),
         "user": user if user else None,
         "js_paths": [*base_metadata["js_paths"], "/ressources/js/station.js"]
     }
@@ -252,7 +254,7 @@ def settings():
                 message = data["message"]
 
                 if response.ok:
-                    res = make_response(redirect(f"/m={message}&status=success"))
+                    res = make_response(redirect(f"/?m={message}&status=success"))
                     return res
                 else:
                     res = make_response(redirect(f"/settings?type=confidential&m={message}&status=error"))
