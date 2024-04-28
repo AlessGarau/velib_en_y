@@ -24,6 +24,10 @@ git clone https://github.com/AlessGarau/velyb
 **Lancer avec Docker**
 
 ```bash
+# Lancer ce script | adapter la commande pour votre terminal (bash \ shell..)
+source generate-database-access-layer.sh user & source generate-database-access-layer.sh favorite & source generate-database-access-layer.sh authentification
+
+# Composer le projet
 docker compose up
 ```
 
