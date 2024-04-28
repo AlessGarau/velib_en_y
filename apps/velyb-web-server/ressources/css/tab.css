@@ -1,4 +1,7 @@
 .tab-nav {
+    position: sticky;
+    top: 251px;
+    background-color: var(--clr-white-primary);
     display: flex;
     flex-flow: row;
     width: 100%;

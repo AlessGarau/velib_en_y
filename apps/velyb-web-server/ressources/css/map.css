@@ -64,3 +64,36 @@
   font-size: var(--fs-small);
   font-weight: var(--fw-medium);
 }
+
+.leaflet-popup-content-wrapper {
+  border-radius: 0;
+  border: 1px solid var(--clr-black-primary);
+  line-height: unset;
+  background-color: var(--clr-white-primary);
+
+  .cta-popup {
+    margin-top: 4px;
+    border-radius: 0;
+    border: none;
+    padding: 8px 16px;
+    width: 100%;
+    color: var(--clr-white-primary);
+    cursor: pointer;
+    
+    &.add {
+      background-color: var(--clr-purple-opacity-30);
+    }
+
+    &.delete {
+      background-color: #dc6803;
+    }
+
+    &.unavailable {
+      background-color: #8C8880;
+    }
+  }
+
+  .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+    color: var(--clr-white-primary);
+  }
+}

@@ -1,21 +1,94 @@
-class Stations {
-    stations_per_commune = new Object();
-    // clé: nnom de la commune
-    // valeur: array avec toutes les stations
+import { addFavorite } from "./favorite.js";
 
-    // Code dans la loop 
-    // if (!this.stations_per_commune.hasOwnProperty(station.nom_arrondissement_communes)) {
-    //     this.stations_per_commune[station.nom_arrondissement_communes] = new Array();
-    //   }
-    //   this.stations_per_commune[station.nom_arrondissement_communes].push({ station: station, marker: marker });
+class Stations {
+    stationContainer = document.getElementsByClassName('station-container')[0]
+    userId = document.cookie.split("user_id=")[1]
+    constructor(dataUrl)
+    {
+        this.dataUrl = dataUrl
+    }
+
+    /**
+     * Génération des stationCards optimisées
+     * @param {Array} opendata Liste des stations
+     */
+    async setStationList(opendata) {
+        let i = 0;
+        const batchSize = 25;
+
+        const processBatch = async () => {
+            while (i < opendata.length) {
+                const batch = opendata.slice(i, i + batchSize);
+                await Promise.all(batch.map(async (station) => {
+                    const stationCard = this.generateStationCard(station);
+                    const divider = this.generateDivider()
+                    this.stationContainer.appendChild(stationCard);
+                    this.stationContainer.appendChild(divider);
+                }));
+                i += batchSize;
+
+                // Allow the browser to update the UI and handle user input
+                await new Promise(resolve => requestAnimationFrame(resolve));
+            }
+        };
+
+        await processBatch();
+    }
+
+    generateStationCard(data) {
+        // main station card container
+        const stationCard = document.createElement('div');
+        stationCard.id = data.stationcode;
+        stationCard.classList.add('station-card');
+
+        // station info container
+        const stationInfos = document.createElement('div');
+        stationInfos.classList.add('station-infos');
+
+        // station name
+        const stationName = document.createElement('h3');
+        stationName.textContent = data.name;
+        stationInfos.appendChild(stationName);
+
+        // station commune
+        const stationCommune = document.createElement('p');
+        stationCommune.textContent = data.nom_arrondissement_communes;
+        stationInfos.appendChild(stationCommune);
+
+        // Append station info container
+        stationCard.appendChild(stationInfos);
+
+        if (this.userId) {
+            const actions = document.createElement('div');
+            actions.classList.add('actions');
+
+            // favorite button
+            const favoriteButton = document.createElement('button');
+            favoriteButton.addEventListener('click', () => addFavorite(data.stationcode, data.name));
+
+
+            // favorite button icon
+            const favoriteIcon = document.createElement('img');
+            favoriteIcon.src = 'ressources/img/fav_icon_empty.svg';
+            favoriteButton.appendChild(favoriteIcon);
+
+            // Add favorite button to actions container
+            actions.appendChild(favoriteButton);
+
+            // Add actions container to station card
+            stationCard.appendChild(actions);
+        }
+
+        return stationCard;
+    }
+
+    generateDivider() {
+        const divider = document.createElement('div');
+        divider.classList.add('divider');
+
+        return divider;
+    }
+
 }
 
-// 1. Fetch toutes les stations 
-// 2. Commune de base: Paris
-// 
-// 3. Loop dans les results du fetch, et créer le html de la station card SI elle est dans la commune spécifiée
-// 4. Faire une variable arrondissements_communes qui est un array avec le nom des communes
-
-// À partir de la variable arrondissements_communes, remplir le select
-
-// EventListener du Select => Lance la loop étape 3 avec la nouvelle commune défini
+export const stations = new Stations('http://localhost:8000/bridge/cache');

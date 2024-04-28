@@ -1,11 +1,14 @@
 import json
 import hashlib
 
+from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 from mysql.connector.cursor import MySQLCursor
 
 from database_access_layer.database import close_connection, connect_to_database
 from database_access_layer.models.user import User
+
+load_dotenv()
 
 app = Flask(__name__)
 cnx = connect_to_database()
@@ -66,7 +69,7 @@ def user_profile():
         close_connection(cnx)
 
 
-@app.route("/api/users", methods=['PUT'])
+@app.route("/api/users", methods=['POST'])
 def update_user():
     cnx = connect_to_database()
 
@@ -116,9 +119,9 @@ def update_user():
                 cursor.close()
 
                 return jsonify({
-                    'data': None,
+                    'message': "Mot de passe modifié avec succès.",
                     'success': True
-                }), 204
+                }), 200
             case "profile":
                 firstname = body.get('firstname')
                 lastname = body.get('lastname')
