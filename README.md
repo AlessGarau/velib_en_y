@@ -5,7 +5,7 @@
 Le projet Velyb est une application web développée en Python à l'aide du framework Flask et du moteur de template Jinja. Son objectif est de fournir une interface conviviale pour visualiser les stations Vélib disponibles dans la ville de Paris.
 
 <!-- Update l'image quand on aura tout fini -->
-![alt text](image.png)
+![alt text](screenshot.png)
 
 ## Fonctionnalités
 
