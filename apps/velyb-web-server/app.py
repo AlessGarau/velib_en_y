@@ -40,6 +40,23 @@ def index():
 
     return render_template('/layouts/index.html', **metadata)
 
+@app.route('/favorites', methods=["GET", "POST", "DELETE"])
+def favorites():
+    user = user_loaders.get_user_from_cookie()
+
+    if not user:
+        return redirect('/')
+
+    metadata = {
+        **base_metadata,
+        "title": "Favorws",
+        "key": "favorites",
+        "station_type": "favorites",
+        "user": user,
+        "js_paths": [*base_metadata["js_paths"], "/ressources/js/station.js"]
+    }
+
+    return render_template('/layouts/favorites.html', **metadata)
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
@@ -151,28 +168,6 @@ def settings():
     }
 
     return render_template('/layouts/settings.html', **metadata)
-
-
-@app.route('/favorites', methods=["GET", "POST"])
-def favorites():
-    user = user_loaders.get_user_from_cookie()
-
-    if not user:
-        return redirect('/')
-
-    metadata = {
-        **base_metadata,
-        "user": user,
-        "title": "Favoris",
-        "key": "favorites",
-        "station_type": "favorites"
-    }
-
-    favorite_stations = requests.get(f"http://microservices_favorite:8002/api/favorites/{user['id']}")
-    metadata["favorite_stations"] = favorite_stations.json()["data"]
-
-    return render_template('/layouts/favorites.html', **metadata)
-
 
 @app.route('/logout')
 def logout():

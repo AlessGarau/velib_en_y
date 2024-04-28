@@ -10,7 +10,7 @@
         </button>
     </div>
     <div class="actions">
-        <button onclick="removeFavorite({{ station["station_code"] }}, '{{ station["name"] }}' )">
+        <button onclick="removeFavorite({{ station["station_code"] }}, '{{ station["name"] | safe }}' )">
             <img src='ressources/img/fav_icon_full.svg' />
         </button>
     </div>

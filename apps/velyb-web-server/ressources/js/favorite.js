@@ -35,13 +35,13 @@ export async function addFavorite(station_code, name) {
 
 window.addFavorite = addFavorite
 
-async function removeFavorite(station_code, name) {
+export async function removeFavorite(station_code, name) {
     try {
         const favoriteCredentials = {
             user_id: user_id
         };
         
-        const res = await fetch(`http://localhost:8002/api/favorites/${station_code}`, {
+        const res = await fetch(`http://localhost:8002/bridge/favorites/${station_code}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
