@@ -133,8 +133,6 @@ h3 {
 }
 
 .selected-station-card {
-  /* background-color: rgba(53, 116, 211, 0.4); */
-
   animation-duration: 4s;
   animation-name: backgroundFade;
   animation-duration: 4s;
@@ -143,9 +141,13 @@ h3 {
 
 @keyframes backgroundFade {
   0% {
-    background-color: rgba(53, 116, 211, 0.4);
+    background-color: rgba(158, 119, 237, 1);
+    color: var(--clr-white-primary);
+  }
+  45% {
+    color: var(--clr-black-primary);
   }
   100% {
-    background-color: rgba(53, 116, 211, 0);
+    background-color: rgba(158, 119, 237, 0);
   }
 }

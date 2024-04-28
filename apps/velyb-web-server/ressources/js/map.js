@@ -3,8 +3,6 @@
 import { stations } from "./station.js";
 
 const userId = document.cookie.split("user_id=")[1];
-const isFavoritePage = window.location.pathname.includes("favorites");
-const isListPage = isFavoritePage|| window.location.pathname === "/"
 
 // Set initial view
 const map = L.map("map").setView([48.8566, 2.3522], 11);
@@ -31,14 +29,13 @@ popupAnchor: [0, -32]
 
 class VelybMap {
   favoriteStations = new Array();
-  totalCount = 0;
   opendataRaw = [];
+  isFavoriteMap = window.location.pathname.includes("favorites");
+  isListPage = this.isFavoriteMap || window.location.pathname === "/"
 
-  constructor(dataUrl, userId = null, isFavoriteMap, isListPage) {
+  constructor(dataUrl, userId = null) {
     this.dataUrl = dataUrl;
     this.userId = userId;
-    this.isFavoriteMap = isFavoriteMap;
-    this.isListPage = isListPage;
   }
 
   async setStations() {
@@ -49,10 +46,8 @@ class VelybMap {
         return;
       } 
 
-      const rawData = await res.json();
-      this.opendataRaw = rawData.results;
-      let opendata = [...this.opendataRaw];
-      this.totalCount = rawData.totalCount;
+      this.opendataRaw = await res.json();
+      let opendata = [...this.opendataRaw.results];
 
       if (this.isFavoriteMap) {
         const resFavs = await fetch(`http://localhost:8000/bridge/favorites/${this.userId}`);
@@ -111,7 +106,7 @@ class VelybMap {
     const sideBar = document.getElementById('sidebar-section')
 
     stationCard.scrollIntoView(true);
-    sideBar.scrollBy({top: -(headerCard.getBoundingClientRect().height), behavior: "smooth"})
+    sideBar.scrollBy({top: -(headerCard.getBoundingClientRect().height + 50), behavior: "smooth"})
 
     stationCard.classList.add('selected-station-card');
     setTimeout(() => {
@@ -120,8 +115,7 @@ class VelybMap {
   }
 }
 
-const isHome = window.location.pathname == "/";
-export const velybMap = new VelybMap("http://localhost:8000/bridge/cache/", userId ? userId : null, isFavoritePage);
+export const velybMap = new VelybMap("http://localhost:8000/bridge/cache/", userId ? userId : null);
 
 await velybMap.setStations();
-if (isHome) await stations.setStationList(velybMap.opendataRaw);
+if (velybMap.isListPage) await stations.setStationList(velybMap.opendataRaw);
