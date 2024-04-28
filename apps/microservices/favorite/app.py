@@ -103,7 +103,7 @@ def delete_favorite(station_code: str):
 
         station = favorite_station_exists(user_id, station_code, cursor, True)
         if not station:
-            raise BaseException(f"La station {FavoriteStation(*station).name} ne se trouve pas dans vos favoris.")
+            raise BaseException(f"Cette station ne se trouve pas dans vos favoris.")
 
         delete_query = """
             DELETE FROM favorite_station 
@@ -145,7 +145,7 @@ def update_favorite(station_code):
 
         station = favorite_station_exists(user_id, station_code, cursor, True)
         if not station:
-            raise BaseException(f"La station {FavoriteStation(*station).name} ne se trouve pas dans vos favoris.")
+            raise BaseException(f"La station ne se trouve pas dans vos favoris.")
 
         update_query = """
             UPDATE favorite_station

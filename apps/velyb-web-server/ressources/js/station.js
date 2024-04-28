@@ -12,7 +12,7 @@ class Stations {
      * Génération des stationCards optimisées
      * @param {Array} opendata Liste des stations
      */
-    async setStationList(opendata) {
+    async setStationList(opendata, favoriteStations) {
         let i = 0;
         const batchSize = 25;
 
@@ -20,7 +20,7 @@ class Stations {
             while (i < opendata.length) {
                 const batch = opendata.slice(i, i + batchSize);
                 await Promise.all(batch.map(async (station) => {
-                    const stationCard = this.generateStationCard(station);
+                    const stationCard = this.generateStationCard(station, favoriteStations.find(favoriteStation => favoriteStation.station_code === station.stationcode));
                     const divider = this.generateDivider()
                     this.stationContainer.appendChild(stationCard);
                     this.stationContainer.appendChild(divider);
@@ -35,7 +35,7 @@ class Stations {
         await processBatch();
     }
 
-    generateStationCard(data) {
+    generateStationCard(data, isFavorite) {
         // main station card container
         const stationCard = document.createElement('div');
         stationCard.id = data.stationcode;
@@ -64,12 +64,26 @@ class Stations {
 
             // favorite button
             const favoriteButton = document.createElement('button');
-            favoriteButton.addEventListener('click', () => addFavorite(data.stationcode, data.name));
-
 
             // favorite button icon
             const favoriteIcon = document.createElement('img');
-            favoriteIcon.src = 'ressources/img/fav_icon_empty.svg';
+
+            // debugger
+            if(isFavorite){
+                // favorite button
+                favoriteButton.addEventListener('click', () => removeFavorite(data.stationcode, data.name));
+
+                // favorite button icon
+                favoriteIcon.src = 'ressources/img/fav_icon_full.svg';
+            } else {
+                // favorite button
+                favoriteButton.addEventListener('click', () => addFavorite(data.stationcode, data.name));
+
+                // favorite button icon
+                favoriteIcon.src = 'ressources/img/fav_icon_empty.svg';
+            }
+
+            // favorite button icon
             favoriteButton.appendChild(favoriteIcon);
 
             // Add favorite button to actions container

@@ -50,13 +50,13 @@ class VelybMap {
       this.opendataRaw = await res.json();
       this.opendataParsed = [...this.opendataRaw.results];
 
+      const resFavs = await fetch(`http://localhost:8000/bridge/favorites/${this.userId}`);
+      if (!resFavs.ok) {
+        console.error("Erreur de chargement des données favorites.")
+        return;  
+      }
+      this.favoriteStations = (await resFavs.json()).data;
       if (this.isFavoriteMap) {
-        const resFavs = await fetch(`http://localhost:8000/bridge/favorites/${this.userId}`);
-        if (!resFavs.ok) {
-          console.error("Erreur de chargement des données favorites.")
-          return;  
-        }
-        this.favoriteStations = (await resFavs.json()).data;
         this.opendataParsed = this.opendataParsed.reduce((acc, curr) => {
           const isFavorite = this.favoriteStations.find(favoriteStation => favoriteStation.station_code === curr.stationcode);
           if (isFavorite) {
@@ -119,4 +119,4 @@ class VelybMap {
 export const velybMap = new VelybMap("http://localhost:8000/bridge/cache/", userId ? userId : null);
 
 await velybMap.setStations();
-if (velybMap.isListPage) await stations.setStationList(velybMap.opendataParsed);
+if (velybMap.isListPage) await stations.setStationList(velybMap.opendataParsed, velybMap.favoriteStations);

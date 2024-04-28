@@ -28,6 +28,14 @@ export async function addFavorite(station_code, name) {
         }
 
         createNotification(`Station ${name} ajoutée aux favoris`, 'success')
+        const stationCard = document.getElementById(station_code);
+        const button = stationCard.getElementsByTagName('button')[0];
+        const image = stationCard.getElementsByTagName('img')[0];
+        button.removeEventListener('click', addFavorite);
+        button.addEventListener('click', () => {
+            removeFavorite(station_code, name)
+        });
+        image.src = '/ressources/img/fav_icon_full.svg';
     } catch (error) {
         console.error("Erreur lors de l'ajout du favori :", error);
     }
@@ -40,8 +48,8 @@ export async function removeFavorite(station_code, name) {
         const favoriteCredentials = {
             user_id: user_id
         };
-        
-        const res = await fetch(`http://localhost:8002/bridge/favorites/${station_code}`, {
+
+        const res = await fetch(`http://localhost:8000/bridge/favorites/${station_code}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -55,8 +63,16 @@ export async function removeFavorite(station_code, name) {
             createNotification(resData.message, 'error');
             return;
         }
-        
+
         createNotification(`Station ${name} supprimée des favoris`, 'success');
+        const stationCard = document.getElementById(station_code);
+        const button = stationCard.getElementsByTagName('button')[0];
+        const image = stationCard.getElementsByTagName('img')[0];
+        button.removeEventListener('click', removeFavorite);
+        button.addEventListener('click', () => {
+            addFavorite(station_code, name)
+        });
+        image.src = '/ressources/img/fav_icon_empty.svg';
     } catch (error) {
         console.error("Erreur lors de la suppression du favori :", error);
     }
