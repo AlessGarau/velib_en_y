@@ -1,5 +1,7 @@
 // TODO - Essayer de garder dernière position en localStorage
 
+import { stations } from "./station.js";
+
 const userId = document.cookie.split("user_id=")[1];
 const isFavoritePage = window.location.pathname.includes("favorites");
 
@@ -29,6 +31,7 @@ popupAnchor: [0, -32]
 class VelybMap {
   favoriteStations = new Array();
   totalCount = 0;
+  opendataRaw = [];
 
   constructor(dataUrl, userId = null, isFavoriteMap) {
     this.dataUrl = dataUrl;
@@ -45,7 +48,8 @@ class VelybMap {
       } 
 
       const rawData = await res.json();
-      let opendata = rawData.results;
+      this.opendataRaw = rawData.results;
+      let opendata = [...this.opendataRaw];
       this.totalCount = rawData.totalCount;
 
       if (this.isFavoriteMap) {
@@ -67,7 +71,7 @@ class VelybMap {
         }, [])
       }
 
-      opendata.map((station) => {
+      await opendata.map((station) => {
         const coordinates = [station.coordonnees_geo.lat, station.coordonnees_geo.lon];
         const icon = this.isFavoriteMap ? favoriteStationIcon : stationIcon;
         const marker = L.marker(coordinates, {icon : icon});
@@ -92,5 +96,8 @@ class VelybMap {
   }
 }
 
-const velybMap = new VelybMap("http://localhost:8000/bridge/cache", userId ? userId : null, isFavoritePage);
-velybMap.setStations();
+const isHome = window.location.pathname == "/";
+export const velybMap = new VelybMap("http://localhost:8000/bridge/cache/", userId ? userId : null, isFavoritePage);
+
+await velybMap.setStations();
+if (isHome) await stations.setStationList(velybMap.opendataRaw);
