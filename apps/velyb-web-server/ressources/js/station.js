@@ -69,16 +69,16 @@ class Stations {
             const favoriteIcon = document.createElement('img');
 
             // debugger
-            if(isFavorite){
+            if(isFavorite) {
                 // favorite button
                 favoriteButton.addEventListener('click', () => removeFavorite(data.stationcode, data.name));
-
+                favoriteButton.classList.add('remove-cta');
                 // favorite button icon
                 favoriteIcon.src = 'ressources/img/fav_icon_full.svg';
             } else {
                 // favorite button
                 favoriteButton.addEventListener('click', () => addFavorite(data.stationcode, data.name));
-
+                favoriteButton.classList.add('add-cta');
                 // favorite button icon
                 favoriteIcon.src = 'ressources/img/fav_icon_empty.svg';
             }

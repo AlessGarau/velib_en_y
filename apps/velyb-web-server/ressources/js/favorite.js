@@ -2,6 +2,12 @@ import { createNotification } from "./common.js";
 
 const user_id = document.cookie.split("user_id=")[1];
 
+/**
+ * Ajout la station en favoris et change la future action en suppression
+ * @param {string} station_code Code de la station
+ * @param {string} name Nom de la station
+ * @returns 
+ */
 export async function addFavorite(station_code, name) {
     try {
         const favoriteCredentials = {
@@ -28,14 +34,11 @@ export async function addFavorite(station_code, name) {
         }
 
         createNotification(`Station ${name} ajoutée aux favoris`, 'success')
-        const stationCard = document.getElementById(station_code);
-        const button = stationCard.getElementsByTagName('button')[0];
-        const image = stationCard.getElementsByTagName('img')[0];
-        button.removeEventListener('click', addFavorite);
-        button.addEventListener('click', () => {
-            removeFavorite(station_code, name)
-        });
-        image.src = '/ressources/img/fav_icon_full.svg';
+        updateCta(station_code, 
+            'add-cta', 
+            'remove-cta', 
+            '/ressources/img/fav_icon_full.svg', 
+            () => removeFavorite(station_code, name))
     } catch (error) {
         console.error("Erreur lors de l'ajout du favori :", error);
     }
@@ -43,6 +46,12 @@ export async function addFavorite(station_code, name) {
 
 window.addFavorite = addFavorite
 
+/**
+ * 
+ * @param {string} station_code Code de la station
+ * @param {string} name Nom de la station
+ * @returns 
+ */
 export async function removeFavorite(station_code, name) {
     try {
         const favoriteCredentials = {
@@ -65,17 +74,28 @@ export async function removeFavorite(station_code, name) {
         }
 
         createNotification(`Station ${name} supprimée des favoris`, 'success');
-        const stationCard = document.getElementById(station_code);
-        const button = stationCard.getElementsByTagName('button')[0];
-        const image = stationCard.getElementsByTagName('img')[0];
-        button.removeEventListener('click', removeFavorite);
-        button.addEventListener('click', () => {
-            addFavorite(station_code, name)
-        });
-        image.src = '/ressources/img/fav_icon_empty.svg';
+        updateCta(station_code, 
+            'remove-cta', 
+            'add-cta',
+            '/ressources/img/fav_icon_empty.svg', 
+            () => addFavorite(station_code, name))
     } catch (error) {
         console.error("Erreur lors de la suppression du favori :", error);
     }
 }
 
 window.removeFavorite = removeFavorite
+
+function updateCta(station_code, oldSelector, newSelector,iconSrc, callBackListener) {
+    const actions = document.getElementById(station_code).querySelector('.actions');
+    const oldButton = Array.from(actions.childNodes).find(action => action.className === oldSelector);
+
+    const newButton = document.createElement('button');
+    newButton.classList.add(newSelector)
+    const favoriteIcon = document.createElement('img');
+    favoriteIcon.src = iconSrc;
+    newButton.appendChild(favoriteIcon)
+    newButton.addEventListener('click', () => callBackListener());
+    
+    actions.replaceChild(newButton, oldButton);
+}
