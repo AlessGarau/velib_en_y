@@ -5,7 +5,7 @@ const isFavoritePage = window.location.pathname.includes("favorites");
 const isListPage = isFavoritePage|| window.location.pathname === "/"
 
 // Set initial view
-const map = L.map("map").setView([48.8566, 2.3522], 13);
+const map = L.map("map").setView([48.8566, 2.3522], 11);
 const mcg = L.markerClusterGroup();
 L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -51,7 +51,7 @@ class VelybMap {
       this.totalCount = rawData.totalCount;
 
       if (this.isFavoriteMap) {
-        const resFavs = await fetch(`http://localhost:8002/api/favorites/${this.userId}`);
+        const resFavs = await fetch(`http://localhost:8000/bridge/favorites/${this.userId}`);
         if (!resFavs.ok) {
           console.error("Erreur de chargement des données favorites.")
           return;  
@@ -116,5 +116,5 @@ class VelybMap {
   }
 }
 
-const velybMap = new VelybMap("http://localhost:8004/", userId ? userId : null, isFavoritePage, isListPage);
+const velybMap = new VelybMap("http://localhost:8000/bridge/cache", userId ? userId : null, isFavoritePage);
 velybMap.setStations();
