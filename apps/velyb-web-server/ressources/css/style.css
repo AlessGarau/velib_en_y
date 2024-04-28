@@ -102,11 +102,8 @@ h3 {
   width: 100%;
   text-align: center;
   font-size: var(--fs-small);
-  animation-duration: 3s;
   animation-name: notificationFade;
-  animation-fill-mode: both;
   animation-duration: 3s;
-  animation-name: notificationFade;
   animation-fill-mode: both;
 }
 
@@ -132,5 +129,25 @@ h3 {
   }
   100% {
     opacity: 0;
+  }
+}
+
+.selected-station-card {
+  animation-duration: 4s;
+  animation-name: backgroundFade;
+  animation-duration: 4s;
+  animation-fill-mode: both;
+}
+
+@keyframes backgroundFade {
+  0% {
+    background-color: rgba(158, 119, 237, 1);
+    color: var(--clr-white-primary);
+  }
+  45% {
+    color: var(--clr-black-primary);
+  }
+  100% {
+    background-color: rgba(158, 119, 237, 0);
   }
 }
