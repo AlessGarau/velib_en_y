@@ -3,6 +3,7 @@ import { addFavorite, removeFavorite } from "./favorite.js";
 class Stations {
     stationContainer = document.getElementsByClassName('station-container')[0]
     userId = document.cookie.split("user_id=")[1]
+    
     constructor(dataUrl)
     {
         this.dataUrl = dataUrl

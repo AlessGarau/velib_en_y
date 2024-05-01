@@ -1,8 +1,12 @@
 import json
+import os
 from flask import Response, jsonify
 import requests
 
-microservice_endpoint = "http://microservices_favorite:8002/api/favorites/"
+favorite_host = os.getenv('MS_FAV_HOST')
+
+
+microservice_endpoint = f"http://{favorite_host}:8002/api/favorites/"
 
 
 def get_favorites(user_id) -> Response:

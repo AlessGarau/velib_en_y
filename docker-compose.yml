@@ -25,6 +25,10 @@ services:
       FLASK_RUN_HOST: 0.0.0.0
       FLASK_RUN_PORT: 8000
       FLASK_ENV: development
+      MS_FAV_HOST: microservices_favorite
+      MS_USER_HOST: microservices_user
+      MS_AUTH_HOST: microservices_authentification
+      CACHE_HOST: api-caching-server
     volumes:
       - ./apps/velyb-web-server:/app
     depends_on:

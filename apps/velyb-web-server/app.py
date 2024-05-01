@@ -1,3 +1,4 @@
+import os
 from loaders import user_loaders, favorite_loaders, station_loaders
 from flask import Flask, make_response, redirect, render_template, request, session
 import json
@@ -26,6 +27,13 @@ base_metadata = {
             {'name': 'Déconnexion', 'link': 'logout', 'key': 'logout'}
         ]
     }
+}
+
+microservice_hosts = {
+    'favorite': os.getenv('MS_FAV_HOST'),
+    'user': os.getenv('MS_USER_HOST'),
+    'authentification': os.getenv('MS_AUTH_HOST'),
+    'cache': os.getenv('CACHE_HOST')
 }
 
 
@@ -71,7 +79,7 @@ def favorites():
         station_code = request.form.get('station_code')
         name_custom = request.form.get('name_custom')
         headers = {'Content-Type': 'application/json'}
-        response = requests.put(f'http://microservices_favorite:8002/api/favorites/{station_code}',
+        response = requests.put(f'http://{microservice_hosts["favorite"]}:8002/api/favorites/{station_code}',
                                 json={
                                     "user_id": request.cookies.get('user_id'),
                                     "name_custom": name_custom
@@ -114,7 +122,7 @@ def login():
             return redirect('/login?m=Email and password are required&status=error')
 
         headers = {'Content-Type': 'application/json'}
-        response = requests.post('http://microservices_authentification:8001/api/authentification/login',
+        response = requests.post(f'http://{microservice_hosts["authentification"]}:8001/api/authentification/login',
                                  json={
                                      "email": email,
                                      "password": password
@@ -163,7 +171,7 @@ def register():
         password = request.form.get("password")
 
         headers = {'Content-Type': 'application/json'}
-        response = requests.post('http://microservices_authentification:8001/api/authentification/register',
+        response = requests.post(f'http://{microservice_hosts["authentification"]}:8001/api/authentification/register',
                                  json={
                                      "firstname": firstname,
                                      "lastname": lastname,
@@ -213,7 +221,7 @@ def settings():
             lastname = request.form.get('lastname')
 
             headers = {'Content-Type': 'application/json'}
-            response = requests.post('http://microservices_user:8003/api/users?type=profile',
+            response = requests.post(f'http://{microservice_hosts["user"]}:8003/api/users?type=profile',
                                      json={
                                          "firstname": firstname,
                                          "lastname": lastname,
@@ -241,7 +249,7 @@ def settings():
                 new_password_repeated = request.form.get('new_password_repeated')
 
                 headers = {'Content-Type': 'application/json'}
-                response = requests.post('http://microservices_user:8003/api/users?type=password',
+                response = requests.post(f'http://{microservice_hosts["user"]}:8003/api/users?type=password',
                                          json={
                                              "old_password": old_password,
                                              "new_password": new_password,
@@ -266,7 +274,7 @@ def settings():
 
 @app.route('/logout')
 def logout():
-    response = requests.get('http://microservices_authentification:8001/api/authentification/logout',
+    response = requests.get(f'http://{microservice_hosts["authentification"]}:8001/api/authentification/logout',
                             cookies=request.cookies)
 
     if response.ok:
