@@ -114,3 +114,4 @@ class OpenDataCache(CacheProtocol):
 - [@AlessGarau](https://github.com/AlessGarau)
 - [@Nyoote](https://github.com/Nyoote)
 - [@LeBenjos](https://github.com/LeBenjos)
+- [@MattisAvec2T](https://github.com/MattisAvec2T)
